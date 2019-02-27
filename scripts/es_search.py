@@ -7,6 +7,7 @@ from requests_aws4auth import AWS4Auth
 
 import boto3
 import requests
+import hashlib
 
 # TODO: consider using geo_shape for polygons instead of just geo_point?
 # May be irrelevant for monuments, small things, etc.
@@ -24,6 +25,15 @@ def create_auth():
 def search_query(json):
     url = HOST + INDEX + '/_search'
     return requests.get(url, auth=create_auth(), json=json)
+
+def find_one_park(park_name):
+    url = HOST + INDEX + '/_doc' + '/_search'
+#    _id = hashlib.sha1(document['name'].encode()).hexdigest()
+    payload = {
+        "query": { "match_exactly": { "name": "Park" } }
+    }
+#    payload = {'q': park_name}
+    return requests.get(url, auth=create_auth())
 
 # Expected distance in km
 def find_close_objects(lat, lon, dist=1, limit=10):
