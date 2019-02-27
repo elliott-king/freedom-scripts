@@ -33,17 +33,19 @@ def search_one():
     r = requests.get(url, params=payload)
     return r
 
+# Place api allows for up to three pages of results.
 def has_next(json):
     return 'next_page_token' in json
 
-def search_nearby(origin_location=fh_origin, radius=5000):
+def search_nearby(origin_location=fh_origin):
     target = 'nearbysearch'
     url = os.path.join(URL, target, OUTPUT)
     payload = {
             'key': KEY,
             'location': origin_location,
             'rankby': 'distance',
-            #'radius': radius,
+            # No need for radius when we rank by distance.
+            # Returned objects will still be within some max radius
             'keyword': search_query
     }
     r = requests.get(url, params=payload)

@@ -51,10 +51,11 @@ def add_items_to_table(table_name, items):
         print('Adding sculpture', sculpture['name'])
 
         sculpture_dump = json.dumps(sculpture)
+        
+        # DynamoDB does not take float values.
         sculpture = json.loads(sculpture_dump, parse_float=decimal.Decimal)
 
         response = table.put_item(Item=sculpture)
-#        print(json.dumps(response, indent=4, cls=DecimalEncoder))
         print('HTTP code', response['ResponseMetadata']['HTTPStatusCode'])
 
 
