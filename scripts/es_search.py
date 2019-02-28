@@ -64,7 +64,9 @@ def find_close_objects(lat, lon, dist=1, limit=10):
 def find_in_bounding_box(
         top_left_lat, top_left_lon, 
         bot_right_lat, bot_right_lon,
-        limit=10):
+        limit=10,
+        host=HOST,
+        index=INDEX):
 
     payload = {
         "from": 0, "size": limit,
@@ -90,5 +92,5 @@ def find_in_bounding_box(
             }
         }
     }
-    return search_query(payload)
+    return search_query(payload, host=host, index=index)
 
