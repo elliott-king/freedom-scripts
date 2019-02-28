@@ -18,19 +18,22 @@ INDEX = 'parks'
 REGION = 'us-east-1'
 SERVICE = 'es'
 
+HOST_SCULPTURES = 'https://search-publicart-o27s44277qkhxj4uh7oeph5vmq.us-east-1.es.amazonaws.com/'
+INDEX_SCULPTURES = 'public_art'
+
 def create_auth():
     credentials = boto3.Session().get_credentials()
     return AWS4Auth(credentials.access_key, credentials.secret_key, REGION, SERVICE)
 
-def search_query(json):
-    url = HOST + INDEX + '/_search'
+def search_query(json, host=HOST, index=INDEX):
+    url = host + index + '/_search'
     return requests.get(url, auth=create_auth(), json=json)
 
-def find_one_park(park_name):
-    url = HOST + INDEX + '/_doc' + '/_search'
+def find_one_park(park_name, host=HOST, index=INDEX):
+    url = host + index + '/doc' + '/_search'
 #    _id = hashlib.sha1(document['name'].encode()).hexdigest()
     payload = {
-        "query": { "match_exactly": { "name": "Park" } }
+            "query": { "match_exactly": { "name": park_name } }
     }
 #    payload = {'q': park_name}
     return requests.get(url, auth=create_auth())
