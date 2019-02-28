@@ -64,16 +64,3 @@ def search_nearby(origin_location=fh_origin):
 
     return results
 
-'''
-Convert from the existing google schema to our simpler schema
-We want:
-    location { lat, lon }
-    name
-    description
-    date_added
-
-Eventually:
-    photo
-'''
-def convert_from_places_to_freedom(place_dict):
-    pass

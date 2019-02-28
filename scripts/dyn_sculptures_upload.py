@@ -8,6 +8,16 @@ from botocore.exceptions import ClientError
 
 GOOGLE_SCULPTURE_TABLE = "GoogleSculptureTable"
 
+# Helper class to convert a DynamoDB item to JSON.
+class DecimalEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, decimal.Decimal):
+            if o % 1 > 0:
+                return float(o)
+            else:
+                return int(o)
+        return super(DecimalEncoder, self).default(o)
+
 def delete_table(table_name):
     dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
     table = dynamodb.Table(table_name)
@@ -59,3 +69,9 @@ def add_items_to_table(table_name, items):
         print('HTTP code', response['ResponseMetadata']['HTTPStatusCode'])
 
 
+def get_all_items_from_table(table_name):
+    dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
+    table = dynamodb.Table(table_name)
+    
+    response = table.scan()
+    return response['Items']
