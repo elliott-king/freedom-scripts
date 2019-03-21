@@ -6,6 +6,7 @@ import uuid
 from boto3.dynamodb.conditions import Key, Attr
 from botocore.exceptions import ClientError
 
+# Stores items exactly as they are structured from the Google Places API
 GOOGLE_SCULPTURE_TABLE = "GoogleSculptureTable"
 
 # Helper class to convert a DynamoDB item to JSON.

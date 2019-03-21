@@ -35,7 +35,7 @@ def createTable(table_name):
     print('creating table')
 
     table = dynamodb.create_table(
-            TableName='FreedomLocationTable',
+            TableName=table_name,
             KeySchema=[
                 {
                     'AttributeName': 'id',
@@ -59,10 +59,10 @@ def deleteAndRecreateTable(table_name):
     deleteTable(table_name)
     createTable(table_name)
 
-def addItemsToTable(items):
+def addItemsToTable(table_name, items):
     dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
 
-    table = dynamodb.Table('FreedomLocationTable')
+    table = dynamodb.Table(table_name)
 
     for park in items:
         (latitude, longitude) = items[park]

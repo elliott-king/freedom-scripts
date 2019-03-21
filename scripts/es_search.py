@@ -35,7 +35,6 @@ def find_one_park(park_name, host=HOST, index=INDEX):
     payload = {
             "query": { "match_exactly": { "name": park_name } }
     }
-#    payload = {'q': park_name}
     return requests.get(url, auth=create_auth())
 
 # Expected distance in km
