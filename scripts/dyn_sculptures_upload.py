@@ -9,6 +9,9 @@ from botocore.exceptions import ClientError
 # Stores items exactly as they are structured from the Google Places API
 GOOGLE_SCULPTURE_TABLE = "GoogleSculptureTable"
 
+# Restructured table using convert_places_for_dynamo.py
+OUR_TABLE = "FreedomLocationAlphaTable"
+
 # Helper class to convert a DynamoDB item to JSON.
 class DecimalEncoder(json.JSONEncoder):
     def default(self, o):
@@ -24,7 +27,7 @@ def delete_table(table_name):
     table = dynamodb.Table(table_name)
     print(table.delete())
 
-def create_table(table_name):
+def create_table(table_name, key_column='name'):
     dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
     session = boto3.session.Session()
     client = session.client('dynamodb', region_name='us-east-1')
@@ -35,13 +38,13 @@ def create_table(table_name):
             TableName=table_name,
             KeySchema=[
                 {
-                    'AttributeName': 'name',
+                    'AttributeName': key_column,
                     'KeyType': 'HASH'
                 }
             ],
             AttributeDefinitions=[
                 {
-                    'AttributeName': 'name',
+                    'AttributeName': key_column,
                     'AttributeType': 'S'
                 }
             ],
@@ -61,10 +64,9 @@ def add_items_to_table(table_name, items):
     for sculpture in items:
         print('Adding sculpture', sculpture['name'])
 
-        sculpture_dump = json.dumps(sculpture)
-        
+        sculpture = json.dumps(sculpture, cls=DecimalEncoder)
         # DynamoDB does not take float values.
-        sculpture = json.loads(sculpture_dump, parse_float=decimal.Decimal)
+        sculpture = json.loads(sculpture, parse_float=decimal.Decimal)
 
         response = table.put_item(Item=sculpture)
         print('HTTP code', response['ResponseMetadata']['HTTPStatusCode'])
