@@ -23,7 +23,7 @@ import time
 import requests 
 import uuid
 
-_TYPES = ['sculpture', 'private']
+_TYPES = ['sculpture', 'public']
 _PHOTO_MAXHEIGHT = 400
 
 def get_photo(photo):
