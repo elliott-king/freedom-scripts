@@ -23,7 +23,9 @@ import time
 import requests 
 import uuid
 
-_TYPES = ['sculpture', 'public']
+# TODO: can't yet handle array of types
+# _TYPES = ['sculpture', 'public']
+_TYPE = 'sculpture'
 _PHOTO_MAXHEIGHT = 400
 
 def get_photo(photo):
@@ -42,7 +44,8 @@ def convert_place_object(place):
         'name': place['name'],
         'location': place['geometry']['location'],
         'date_added': time.time(),
-        'types': _TYPES,
+        # TODO: support list of types (see above)
+        'type': _TYPE,
         'id': str(uuid.uuid4()),
         'photos': []
     }

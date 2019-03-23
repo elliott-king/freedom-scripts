@@ -10,7 +10,7 @@ from botocore.exceptions import ClientError
 GOOGLE_SCULPTURE_TABLE = "GoogleSculptureTable"
 
 # Restructured table using convert_places_for_dynamo.py
-OUR_TABLE = "FreedomLocationAlphaTable"
+PHOTO_TABLE = "FreedomLocationAlphaTable"
 
 # Helper class to convert a DynamoDB item to JSON.
 class DecimalEncoder(json.JSONEncoder):
