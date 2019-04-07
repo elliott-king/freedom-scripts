@@ -30,6 +30,7 @@ _PHOTO_MAXHEIGHT = 400
 
 def get_photo(photo):
     url = 'https://maps.googleapis.com/maps/api/place/photo'
+    # TODO: key currently blocked. Update key.
     payload = {
             'key': 'AIzaSyAZOtnRbMiYCyHWzI7EPhJylNYs-G573Uw',
             'maxheight': _PHOTO_MAXHEIGHT,

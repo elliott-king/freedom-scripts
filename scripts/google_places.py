@@ -4,6 +4,7 @@ import time
 
 URL = 'https://maps.googleapis.com/maps/api/place/'
 OUTPUT = 'json'
+# TODO: key will not currently work. Update.
 KEY = 'AIzaSyAZOtnRbMiYCyHWzI7EPhJylNYs-G573Uw'
 INPUTTYPE = 'textquery'
 PUBLIC_ART_FILE = '../public_art.json'
@@ -14,6 +15,7 @@ queens_bias = 'rectangle:40.7092498169891,-73.85618650635172|40.73060467030399,-
 mnh_bias = 'rectangle:40.72986238308025,-74.02576541648762|40.72986238308025,-74.02576541648762'
 
 fh_origin = '40.719712,-73.838606'
+jh_origin = '40.750613,-73.878024'
 mnh_origin = '40.727551,-73.998561'
 buff_origin = '42.912674,-78.881672'
 
