@@ -57,11 +57,12 @@ def translate_google_response_to_document(place):
         'name': place['name'],
         'location': {
             # NOTE that es and google place api use different keys for longitude
-            'lat': place['geometry']['location']['lat'],
-            'lon': place['geometry']['location']['lng']
+            'lat': place['location']['lat'],
+            'lon': place['location']['lng']
         },
         'date_added': time.time(),
-        'type': 'sculpture'
+        'type': 'sculpture',
+        'id': place['id']
     }
     return document
 

@@ -7,7 +7,7 @@ from boto3.dynamodb.conditions import Key, Attr
 from botocore.exceptions import ClientError
 
 # Stores items exactly as they are structured from the Google Places API
-GOOGLE_SCULPTURE_TABLE = "GoogleSculptureTable"
+GOOGLE_SCULPTURE_NOCHANGE = "GoogleSculptureTable"
 
 # Restructured table using convert_places_for_dynamo.py
 PHOTO_TABLE = "FreedomLocationAlphaTable"
