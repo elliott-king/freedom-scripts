@@ -25,11 +25,11 @@ def create_auth():
     credentials = boto3.Session().get_credentials()
     return AWS4Auth(credentials.access_key, credentials.secret_key, REGION, SERVICE)
 
-def search_query(json, host=HOST, index=INDEX):
+def search_query(json, host=HOST_SCULPTURES, index=INDEX_SCULPTURES):
     url = host + index + '/_search'
     return requests.get(url, auth=create_auth(), json=json)
 
-def find_one_park(park_name, host=HOST, index=INDEX):
+def find_one_park(park_name, host=HOST_SCULPTURES, index=INDEX_SCULPTURES):
     url = host + index + '/doc' + '/_search'
 #    _id = hashlib.sha1(document['name'].encode()).hexdigest()
     payload = {
@@ -64,8 +64,8 @@ def find_in_bounding_box(
         top_left_lat, top_left_lon, 
         bot_right_lat, bot_right_lon,
         limit=10,
-        host=HOST,
-        index=INDEX):
+        host=HOST_SCULPTURES,
+        index=INDEX_SCULPTURES):
 
     payload = {
         "from": 0, "size": limit,

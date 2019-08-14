@@ -2,10 +2,15 @@ import requests
 import os
 import time
 
+import es_sculptures_upload 
+import dyn_sculptures_upload
+import convert_places_for_dynamo
+
 URL = 'https://maps.googleapis.com/maps/api/place/'
 OUTPUT = 'json'
-# TODO: key will not currently work. Update.
-KEY = 'AIzaSyAZOtnRbMiYCyHWzI7EPhJylNYs-G573Uw'
+# DO NOT SUBMIT: cannot make git repo public now.
+# Maybe store elsewhere on disk
+KEY = 'AIzaSyCZ21RlCa8IVwxR-58b8fTgUXn_a4UYhbc'
 INPUTTYPE = 'textquery'
 PUBLIC_ART_FILE = '../public_art.json'
 
@@ -18,6 +23,7 @@ fh_origin = '40.719712,-73.838606'
 jh_origin = '40.750613,-73.878024'
 mnh_origin = '40.727551,-73.998561'
 buff_origin = '42.912674,-78.881672'
+jersey_city_origin = '40.720474,-74.043823'
 
 # Fields to use in the future.
 desired_fields = { 'price_level', 'photos'}
