@@ -42,17 +42,21 @@ def client():
 
 '''
 Convert from the existing google schema to our simpler schema
+First change object using convert_places_for_dynamo
 We want:
     location { lat, lon }
     name
-    description
-    date_added
     type (string: painting, sculpture, monument)
 
 Eventually:
-    photo
+    dynamodb table id 
+    # TODO: we should generate a proprietary one.
+
+Not needed in ES:
+    date_added
+    description
 '''
-def translate_google_response_to_document(place):
+def dyn_document_to_es_document(place):
     document = {
         'name': place['name'],
         'location': {
@@ -60,7 +64,6 @@ def translate_google_response_to_document(place):
             'lat': place['location']['lat'],
             'lon': place['location']['lng']
         },
-        'date_added': time.time(),
         'type': 'sculpture',
         'id': place['id']
     }

@@ -7,6 +7,7 @@ from boto3.dynamodb.conditions import Key, Attr
 from botocore.exceptions import ClientError
 
 # Stores items exactly as they are structured from the Google Places API
+# Deprecated
 GOOGLE_SCULPTURE_NOCHANGE = "GoogleSculptureTable"
 
 # Restructured table using convert_places_for_dynamo.py
@@ -37,6 +38,7 @@ def create_table(table_name, key_column='name'):
     client.get_waiter('table_not_exists').wait(TableName=table_name)
     print('creating table')
 
+    # TODO: add sort key: 'name'
     table = dynamodb.create_table(
             TableName=table_name,
             KeySchema=[
@@ -73,11 +75,11 @@ def add_items_to_table(table_name, items):
 
         response = table.put_item(Item=sculpture)
         print('HTTP code', response['ResponseMetadata']['HTTPStatusCode'])
-
-
+        
 def get_all_items_from_table(table_name):
     dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
     table = dynamodb.Table(table_name)
     
     response = table.scan()
     return response['Items']
+
