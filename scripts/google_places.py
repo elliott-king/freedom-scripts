@@ -2,8 +2,8 @@ import requests
 import os
 import time
 
-import es_sculptures_upload 
-import dyn_sculptures_upload
+import es_upload 
+import dyn_upload
 import convert_places_for_dynamo
 
 URL = 'https://maps.googleapis.com/maps/api/place/'
@@ -73,11 +73,11 @@ def search_nearby(origin_location=fh_origin):
     return results
 
 def search_and_upload(origin_location):
-    client = es_sculptures_upload.client()
+    client = es_upload.client()
     items_from_google = search_nearby(origin_location)
     print(f"Pulled {len(items_from_google)} items from google places api.")
 
-    from_dynamo = dyn_sculptures_upload.get_all_items_from_table(dyn_sculptures_upload.BETA_TABLE)
+    from_dynamo = dyn_upload.get_all_items_from_table(dyn_upload.BETA_TABLE)
     names = set()
     for item in from_dynamo:
         names.add(item['name'])
@@ -85,7 +85,7 @@ def search_and_upload(origin_location):
     for item in items_from_google:
         if item['name'] not in names:
             item = convert_places_for_dynamo.convert_place_object(item)
-            dyn_sculptures_upload.add_items_to_table(
-                    dyn_sculptures_upload.BETA_TABLE, [item])
-            item = es_sculptures_upload.dyn_document_to_es_document(item)
-            es_sculptures_upload.index(client, item)
+            dyn_upload.add_items_to_table(
+                    dyn_upload.BETA_TABLE, [item])
+            item = es_upload.dyn_document_to_es_document(item)
+            es_upload.index(client, item)
