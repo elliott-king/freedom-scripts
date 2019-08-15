@@ -47,10 +47,7 @@ We want:
     location { lat, lon }
     name
     type (string: painting, sculpture, monument)
-
-Eventually:
-    dynamodb table id 
-    # TODO: we should generate a proprietary one.
+    dynamodb item id
 
 Not needed in ES:
     date_added
@@ -80,7 +77,7 @@ def bulk_index(client, documents):
 
     def gendata():
         for doc in documents:
-            doc = translate_google_response_to_document(doc)
+            doc = dyn_document_to_es_document(doc)
             yield {
                     '_id': hashlib.sha1(doc['name'].encode()).hexdigest(),
                     '_index': index,

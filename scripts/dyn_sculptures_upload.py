@@ -10,11 +10,11 @@ from botocore.exceptions import ClientError
 # Deprecated
 GOOGLE_SCULPTURE_NOCHANGE = "GoogleSculptureTable"
 
-# Restructured table using convert_places_for_dynamo.py
-ALPHA_TABLE = "FreedomLocationAlphaTable"
-
 # Updated Beta table. Uses ID as key.
 BETA_TABLE = "FreedomLocationBetaTable"
+
+# Updated table. Photo field is simplified into strings.
+GAMMA_TABLE = "FreedomLocationGammaTable"
 
 # Helper class to convert a DynamoDB item to JSON.
 class DecimalEncoder(json.JSONEncoder):
@@ -31,7 +31,7 @@ def delete_table(table_name):
     table = dynamodb.Table(table_name)
     print(table.delete())
 
-def create_table(table_name, key_column='name'):
+def create_table(table_name, key_column='id'):
     dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
     session = boto3.session.Session()
     client = session.client('dynamodb', region_name='us-east-1')
