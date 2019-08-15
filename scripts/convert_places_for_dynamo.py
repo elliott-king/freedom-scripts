@@ -52,9 +52,21 @@ def convert_place_object(place):
 
     if 'photos' in place:
         for photo in place['photos']:
-            photo_dict = {'link': get_photo(photo).url}
-            if photo['html_attributions']:
-                photo_dict['attribution'] = photo['html_attributions'][0]
-            location['photos'].append(photo_dict)
+            url = get_photo(photo).url
+            location['photos'].append(url)
     print("Converted place:", place['name'])
     return location 
+
+def convert_old_dynamo_place(p):
+    location = {
+            'name': p['name'],
+            'location': p['location'],
+            'date_added': p['date_added'],
+            'type': p['type'],
+            'id': p['id'],
+            'photos': []
+        }
+    if p['photos']: 
+        location['photos'].append(p['photos'][0]['link'])
+
+    return location
