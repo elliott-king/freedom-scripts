@@ -75,6 +75,8 @@ def search_nearby(origin_location=fh_origin):
 def search_and_upload(origin_location):
     client = es_upload.client()
     items_from_google = search_nearby(origin_location)
+    # Something from google w/out a photo is likely useless.
+    items_from_google = [i for i in items_from_google if 'photos' in i]
     print(f"Pulled {len(items_from_google)} items from google places api.")
 
     from_dynamo = dyn_upload.get_all_items_from_table(dyn_upload.BETA_TABLE)
