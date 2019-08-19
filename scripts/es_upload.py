@@ -10,29 +10,30 @@ HOST = 'search-publicart-o27s44277qkhxj4uh7oeph5vmq.us-east-1.es.amazonaws.com'
 REGION = 'us-east-1'
 SERVICE = 'es'
 
-INDEX = 'public_art'
+INDEX = 'publicart'
 
-def setup_index(client):
-    client.indices.create(index=INDEX)
+def setup_index(client, index=INDEX):
+    client.indices.create(index=index)
     body = {
         "properties": {
             "location": { "type": "geo_point"},
-            "date_added": { "type": "date" }
+            "createdAt": { "type": "date" },
+            "updatedAt": { "type": "date" },
         }
     }
 
-    return client.indices.put_mapping(index=INDEX, doc_type='_doc', body=body)
+    return client.indices.put_mapping(index=index, doc_type='doc', body=body)
 
-def delete_index(client):
-    client.indices.delete(index=INDEX)
+def delete_index(client, index=INDEX):
+    client.indices.delete(index=index)
 
-def client():
+def client(host=HOST):
     credentials = boto3.Session().get_credentials()
     awsauth = AWS4Auth(
             credentials.access_key, credentials.secret_key, REGION, SERVICE)
 
     es = Elasticsearch(
-            hosts = [{'host': HOST, 'port': 443}],
+            hosts = [{'host': host, 'port': 443}],
             https_auth = awsauth,
             use_ssl = True,
             verify_certs = True,
@@ -66,14 +67,14 @@ def dyn_document_to_es_document(place):
     }
     return document
 
-def index(client, document):
+# WARN: doc type used to be '_doc'
+def index(client, document, index=INDEX):
     _id = hashlib.sha1(document['name'].encode()).hexdigest()
-    return client.index(index=INDEX, doc_type='_doc', id=_id, body=document)
+    return client.index(index=index, doc_type='doc', id=_id, body=document)
 
 # https://elasticsearch-py.readthedocs.io/en/6.3.1/helpers.html?highlight=bulk()
-def bulk_index(client, documents):
-    index = INDEX
-    doc_type = '_doc'
+def bulk_index(client, documents, index=INDEX):
+    doc_type = 'doc'
 
     def gendata():
         for doc in documents:

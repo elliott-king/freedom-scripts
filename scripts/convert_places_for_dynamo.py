@@ -42,7 +42,11 @@ def get_photo(photo):
 def convert_place_object(place):
     location = {
         'name': place['name'],
-        'location': place['geometry']['location'],
+#        'location': place['geometry']['location'],
+        'location': {
+            'lat': place['geometry']['location']['lat'],
+            'lon': place['geometry']['location']['lng']
+            },
         'date_added': time.time(),
         # TODO: support list of types (see above)
         'type': _TYPE,
@@ -60,13 +64,18 @@ def convert_place_object(place):
 def convert_old_dynamo_place(p):
     location = {
             'name': p['name'],
-            'location': p['location'],
-            'date_added': p['date_added'],
+#            'location': p['location'],
+            'location': {
+                'lat': p['location']['lat'],
+                'lon': p['location']['lng']
+                },
+            'createdAt': time.time(),
             'type': p['type'],
             'id': p['id'],
-            'photos': []
         }
-    if p['photos']: 
-        location['photos'].append(p['photos'][0]['link'])
+    if 'photos' in p:
+        location['photos'] = p['photos']
+#    if p['photos']: 
+#        location['photos'].append(p['photos'][0]['link'])
 
     return location
