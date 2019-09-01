@@ -45,7 +45,7 @@ def search_one():
 def has_next(json):
     return 'next_page_token' in json
 
-def search_nearby(origin_location=fh_origin):
+def search_nearby(origin_location=fh_origin, query=search_query):
     target = 'nearbysearch'
     url = os.path.join(URL, target, OUTPUT)
     payload = {
@@ -54,7 +54,7 @@ def search_nearby(origin_location=fh_origin):
             'rankby': 'distance',
             # No need for radius when we rank by distance.
             # Returned objects will still be within some max radius
-            'keyword': search_query
+            'keyword': query
     }
     r = requests.get(url, params=payload)
     j = r.json()
@@ -72,22 +72,19 @@ def search_nearby(origin_location=fh_origin):
 
     return results
 
-def search_and_upload(origin_location):
-    client = es_upload.client()
-    items_from_google = search_nearby(origin_location)
+def search_and_upload(origin_location, query=search_query):
+    items_from_google = search_nearby(origin_location, query=query)
     # Something from google w/out a photo is likely useless.
     items_from_google = [i for i in items_from_google if 'photos' in i]
     print(f"Pulled {len(items_from_google)} items from google places api.")
 
-    from_dynamo = dyn_upload.get_all_items_from_table(dyn_upload.BETA_TABLE)
+    from_dynamo = dyn_upload.get_all_items_from_table('PublicArt-cevvqsg2rzeifnuzezmiqvz3bu-freedom')
     names = set()
     for item in from_dynamo:
-        names.add(item['name'])
+        if item['type'] == query:
+            names.add(item['name'])
 
     for item in items_from_google:
         if item['name'] not in names:
-            item = convert_places_for_dynamo.convert_place_object(item)
-            dyn_upload.add_items_to_table(
-                    dyn_upload.BETA_TABLE, [item])
-            item = es_upload.dyn_document_to_es_document(item)
-            es_upload.index(client, item)
+            item = convert_places_for_dynamo.convert_place_object(item, place_type=query)
+            dyn_upload.add_items_to_table('PublicArt-cevvqsg2rzeifnuzezmiqvz3bu-freedom', [item])

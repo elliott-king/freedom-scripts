@@ -39,7 +39,7 @@ def get_photo(photo):
     return r
 
 
-def convert_place_object(place):
+def convert_place_object(place, place_type=_TYPE):
     location = {
         'name': place['name'],
 #        'location': place['geometry']['location'],
@@ -49,7 +49,7 @@ def convert_place_object(place):
             },
         'date_added': time.time(),
         # TODO: support list of types (see above)
-        'type': _TYPE,
+        'type': place_type,
         'id': str(uuid.uuid4()),
         'photos': []
     }
