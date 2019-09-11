@@ -23,6 +23,8 @@ import time
 import requests 
 import uuid
 
+import photo_handler
+
 # TODO: can't yet handle array of types
 # _TYPES = ['sculpture', 'public']
 _TYPE = 'sculpture'
@@ -56,8 +58,9 @@ def convert_place_object(place, place_type=_TYPE):
 
     if 'photos' in place:
         for photo in place['photos']:
-            url = get_photo(photo).url
-            location['photos'].append(url)
+            google_url = get_photo(photo).url
+            s3_url = photo_handler.get_photo(google_url)
+            location['photos'].append(s3_url)
     print("Converted place:", place['name'])
     return location 
 
