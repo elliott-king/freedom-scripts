@@ -15,6 +15,8 @@ INPUTTYPE = 'textquery'
 PUBLIC_ART_FILE = '../public_art.json'
 
 search_query = 'sculpture'
+recommended_queries = ['sculpture', 'mural']
+
 fields = { 'geometry/location', 'name', 'types', 'place_id'}
 queens_bias = 'rectangle:40.7092498169891,-73.85618650635172|40.73060467030399,-73.81966769364828'
 mnh_bias = 'rectangle:40.72986238308025,-74.02576541648762|40.72986238308025,-74.02576541648762'
@@ -36,12 +38,17 @@ buff_origin = '42.912674,-78.881672'
 # Fields to use in the future.
 desired_fields = { 'price_level', 'photos'}
 
-def search_one():
+def validate_query(query):
+    if query not in recommended_queries:
+        raise ValueError('Must use a recommended query: ' + str(recommended_queries))
+
+def search_one(query=search_query):
+    validate_query(query)
     target = 'findplacefromtext'
     url = os.path.join(URL, target, OUTPUT)
     payload = {
                 'locationbias': mnh_bias,
-                'input': search_query,
+                'input': query,
                 'inputtype': INPUTTYPE,
                 'fields': ','.join(fields),
                 'key': KEY
@@ -54,6 +61,7 @@ def has_next(json):
     return 'next_page_token' in json
 
 def search_nearby(origin_location=fh_origin, query=search_query):
+    validate_query(query)
     target = 'nearbysearch'
     url = os.path.join(URL, target, OUTPUT)
     payload = {
@@ -81,6 +89,7 @@ def search_nearby(origin_location=fh_origin, query=search_query):
     return results
 
 def search_and_upload(origin_location, query=search_query):
+    validate_query(query)
     items_from_google = search_nearby(origin_location, query=query)
     # Something from google w/out a photo is likely useless.
     items_from_google = [i for i in items_from_google if 'photos' in i]
