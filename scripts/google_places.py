@@ -21,9 +21,17 @@ mnh_bias = 'rectangle:40.72986238308025,-74.02576541648762|40.72986238308025,-74
 
 fh_origin = '40.719712,-73.838606'
 jh_origin = '40.750613,-73.878024'
-mnh_origin = '40.727551,-73.998561'
-buff_origin = '42.912674,-78.881672'
+
+mnh_origins = {
+    'wsp_origin': '40.727551,-73.998561',
+    'battery_origin': '40.703427, -74.014586',
+    'flatiron_origin': '40.742061, -73.988371',
+    'rock_origin': '40.759731, -73.980847',
+    'met_origin': '40.779129, -73.963025',
+}
+
 jersey_city_origin = '40.720474,-74.043823'
+buff_origin = '42.912674,-78.881672'
 
 # Fields to use in the future.
 desired_fields = { 'price_level', 'photos'}
