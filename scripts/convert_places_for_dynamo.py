@@ -53,6 +53,7 @@ def convert_place_object(place, place_type=_TYPE):
         # TODO: support list of types (see above)
         'type': place_type,
         'id': str(uuid.uuid4()),
+        'permanent': True,
         'photos': []
     }
 
