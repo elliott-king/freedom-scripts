@@ -6,6 +6,9 @@ import uuid
 from boto3.dynamodb.conditions import Key, Attr
 from botocore.exceptions import ClientError
 
+# Updating items after a full table scan.
+# table.update_item(Key={'id': item['id']}, UpdateExpression='set permanent = :r', ExpressionAttributeValues={':r': 'true'})
+
 # Stores items exactly as they are structured from the Google Places API
 # Deprecated
 GOOGLE_SCULPTURE_NOCHANGE = "GoogleSculptureTable"
