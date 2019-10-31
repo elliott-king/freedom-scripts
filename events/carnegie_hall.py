@@ -5,6 +5,7 @@ import json
 import os
 
 from bs4 import BeautifulSoup
+from datetime import datetime, time
 
 API_URL = 'https://maps.googleapis.com/maps/api/place/'
 OUTPUT = 'json'
@@ -44,9 +45,11 @@ def events():
     for hit in response.json()['results'][0]['hits']:
         info = {
             'name': hit['title'],
-            'date': hit['date'],
-            'url': 'https://carnegiehall.org' + hit['url'],
-            'time': hit['time'],
+            'datetime': datetime.combine(
+                        datetime.strptime(hit['date'], '%A, %b %d, %Y'),
+                        timeformat(hit['time'])
+                    ).isoformat(),
+            'website': 'https://carnegiehall.org' + hit['url'],
             'photos': [hit['image']['src']],
             'host': 'Carnegie Hall',
             'location_description': hit['facility'],
@@ -54,25 +57,23 @@ def events():
             # location, description
         }
 
-        more_info_response = requests.get(info['url'])
+        more_info_response = requests.get(info['website'])
         soup = BeautifulSoup(more_info_response.text, 'html.parser')
 
         location_text = soup.find_all(class_='ch-event-facilityNotes')[0].text
         description_text = soup.find_all(class_='ch-page-hero-block__content')[0].text
 
-        print(location_text)
-        location_text = location_text.strip().split('\n')[2]
+        location_text = ' '.join(location_text.strip().split('\n')[2:-1])
         description_text = description_text.strip()
         info['description'] = description_text
 
         r = search_one(location_text)
         j = r.json()['candidates'][0] # first result assumed correct
-        print(location_text, j['geometry'])
         
         info['location'] = {
             'lat': j['geometry']['location']['lat'],
             'lon': j['geometry']['location']['lng']
-        },
+        }
         i.append(info)
     return i
 
@@ -91,3 +92,23 @@ def search_one(name):
             }
     r = requests.get(url, params=payload)
     return r
+
+def timeformat(t):
+    hour, minute, post = 0,0,'AM'
+    check = t[1]
+    if check == ' ' or check == ':':
+        hour = int(t[0])
+        post = t[-2:]
+        if check == ':':
+            minute = int(t[2:4])
+    else:
+        check = t[2]
+        hour = int(t[:2])
+        post = t[-2:]
+        if check == ':':
+            minute = int(t[3:5])
+    if hour == 12:
+        hour = 0
+    if post == 'PM':
+        hour += 12
+    return time(hour=hour, minute=minute)
