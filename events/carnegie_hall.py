@@ -45,16 +45,16 @@ def events():
     for hit in response.json()['results'][0]['hits']:
         info = {
             'name': hit['title'],
-            'datetime': datetime.combine(
-                        datetime.strptime(hit['date'], '%A, %b %d, %Y'),
-                        timeformat(hit['time'])
-                    ).isoformat(),
+            # TODO: datetime is just set as UTC..
+            'datetime': str(datetime.combine(
+                            datetime.strptime(hit['date'], '%A, %b %d, %Y'),
+                            timeformat(hit['time'])
+                        ).isoformat()) + 'Z',
             'website': 'https://carnegiehall.org' + hit['url'],
             'photos': [hit['image']['src']],
             'host': 'Carnegie Hall',
             'location_description': hit['facility'],
-            'type': 'music',
-            # location, description
+            'type': ['music'],
         }
 
         more_info_response = requests.get(info['website'])
