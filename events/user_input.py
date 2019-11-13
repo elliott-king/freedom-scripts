@@ -18,11 +18,11 @@ mnh_bias = 'point:40.72986238308025,-74.02576541648762'
 multi_fields = ['types', 'dates', 'times']
 
 title_fields = [
-    'name', 'host', 'source', 'location_description'
+    'name', 'host', 'location_description'
 ]
 
 single_fields = [
-    'description','website', 'rsvp'
+    'description','website', 'rsvp', 'source'
     # Omit 'location', need Google for that.
     # omit photos?
 ]
