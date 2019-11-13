@@ -61,6 +61,7 @@ def request_input(d):
         d['location'] = search_one(d['location_description'])
 
     pprint.pprint(d)
+    check_filled(d)
     upload = input('Upload (y/N)? ')
     if upload in ['y', 'Y', 'yes', 'Yes']:
         events_upload.add_items_to_table(events_upload.EVENTS_TABLE, [d])
@@ -82,7 +83,10 @@ def search_one(name):
             }
     r = requests.get(url, params=payload)
 
-    j = r.json()['candidates'][0] # first result probably correct
+    try:
+        j = r.json()['candidates'][0] # first result probably correct
+    except IndexError:
+        raise TypeError('No location found: ', name)
     
     location = {
         'lat': j['geometry']['location']['lat'],
@@ -116,6 +120,7 @@ def apply_dates(d):
         d['dates'] = dates
 
 def apply_types(d):
+
     print('types:', d['types'])
     types = []
     while(True):
@@ -126,3 +131,9 @@ def apply_types(d):
             break
     if types:
         d['types'] = types
+
+def check_filled(d):
+    for f in multi_fields + title_fields + single_fields:
+        if f != 'times' and f != 'rsvp':
+            if not d[f]:
+                raise TypeError('Expecting at least one value for field: ' + f)
