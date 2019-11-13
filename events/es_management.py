@@ -17,7 +17,8 @@ def setup_index(client, index=INDEX):
     body = {
         "properties": {
             "location": { "type": "geo_point"},
-            "datetime": { "type": "date" }
+            "dates": { "type": "date"},
+            "times": { "type": "text"}
         }
     }
 
