@@ -7,14 +7,6 @@ import os
 from bs4 import BeautifulSoup
 from datetime import datetime, time
 
-API_URL = 'https://maps.googleapis.com/maps/api/place/'
-OUTPUT = 'json'
-# DO NOT SUBMIT: cannot make git repo public now.
-# Maybe store elsewhere on disk
-API_KEY = 'AIzaSyCZ21RlCa8IVwxR-58b8fTgUXn_a4UYhbc'
-INPUTTYPE = 'textquery'
-mnh_bias = 'rectangle:40.72986238308025,-74.02576541648762|40.72986238308025,-74.02576541648762'
-
 headers = {
     'authority': 'q0tmlopf1j-dsn.algolia.net',
     'accept': 'application/json',
@@ -43,18 +35,19 @@ def events():
     response = eval()
     i = []
     for hit in response.json()['results'][0]['hits']:
+
         info = {
             'name': hit['title'],
             # TODO: datetime is just set as UTC..
-            'datetime': str(datetime.combine(
-                            datetime.strptime(hit['date'], '%A, %b %d, %Y'),
-                            timeformat(hit['time'])
-                        ).isoformat()) + 'Z',
+            'dates': [str(datetime.strptime(hit['date'], '%A, %b %d, %Y').date())],
+            'times': [str(timeformat(hit['time']))],
             'website': 'https://carnegiehall.org' + hit['url'],
             'photos': [hit['image']['src']],
             'host': 'Carnegie Hall',
+            'source': 'Carnegie Hall Citywide',
             'location_description': hit['facility'],
-            'type': ['music'],
+            'types': ['music'],
+            'rsvp': True # TODO: currently assuming the worst
         }
 
         more_info_response = requests.get(info['website'])
@@ -66,32 +59,8 @@ def events():
         location_text = ' '.join(location_text.strip().split('\n')[2:-1])
         description_text = description_text.strip()
         info['description'] = description_text
-
-        r = search_one(location_text)
-        j = r.json()['candidates'][0] # first result assumed correct
-        
-        info['location'] = {
-            'lat': j['geometry']['location']['lat'],
-            'lon': j['geometry']['location']['lng']
-        }
         i.append(info)
     return i
-
-
-def search_one(name):
-    query = name
-    target = 'findplacefromtext'
-    fields = {'geometry/location', 'name', 'types', 'place_id'}
-    url = os.path.join(API_URL, target, OUTPUT)
-    payload = {
-                'locationbias': mnh_bias,
-                'input': query,
-                'inputtype': INPUTTYPE,
-                'fields': ','.join(fields),
-                'key': API_KEY
-            }
-    r = requests.get(url, params=payload)
-    return r
 
 def timeformat(t):
     hour, minute, post = 0,0,'AM'

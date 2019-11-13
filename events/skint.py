@@ -22,7 +22,7 @@ def events():
                 d = {
                     'name': entry.b.text,
                     'website': entry.a.get('href'),
-                    'description': entry.text,
+                    'description': entry.text[:-3],
                     'source': 'The Skint',
                     'rsvp': 'rsvp' in entry.text
                 }

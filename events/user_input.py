@@ -6,6 +6,8 @@ import os
 from dateutil.parser import parse
 from datetime import datetime
 
+import events_upload
+
 API_URL = 'https://maps.googleapis.com/maps/api/place/'
 OUTPUT = 'json'
 # Maybe store elsewhere on disk
@@ -13,7 +15,7 @@ API_KEY = 'AIzaSyCZ21RlCa8IVwxR-58b8fTgUXn_a4UYhbc'
 INPUTTYPE = 'textquery'
 mnh_bias = 'point:40.72986238308025,-74.02576541648762'
 
-multi_fields = ['types', 'dates']
+multi_fields = ['types', 'dates', 'times']
 
 title_fields = [
     'name', 'host', 'source', 'location_description'
@@ -26,7 +28,7 @@ single_fields = [
 ]
 
 # should create new dict
-def request_input(text, d):
+def request_input(d):
     print('=' * 40)
     missing = []
     for f in (single_fields + title_fields):
@@ -39,7 +41,7 @@ def request_input(text, d):
             d[f] = []
     print('Expected but did not find:', missing)
     print('Text:')
-    print(text)
+    print(d['description'])
 
     # Accept user input for singleton fields
     for f in d:
@@ -52,12 +54,18 @@ def request_input(text, d):
                 d[f] = d[f].title()
 
     apply_dates(d)
+    apply_times(d)
     apply_types(d)
 
     if 'location' not in d:
         d['location'] = search_one(d['location_description'])
 
     pprint.pprint(d)
+    upload = input('Upload (y/N)? ')
+    if upload in ['y', 'Y', 'yes', 'Yes']:
+        events_upload.add_items_to_table(events_upload.EVENTS_TABLE, [d])
+    else:
+        print('Did not upload')
     
 # It's good if the location_description is not the possessive form
 def search_one(name):
@@ -82,13 +90,26 @@ def search_one(name):
     }
     return location
 
+def apply_times(d):
+    print('times:', d['times'])
+    times = []
+    while(True):
+        new = input('Enter a time, or refuse: ')
+        if new and new != 'yes' and new != 'y' and new != 'Y' and new != 'Yes':
+            times.append(str(parse(new).time()))
+        else:
+            break
+    if times:
+        d['times'] = times
+    
+
 def apply_dates(d):
     print('dates:', d['dates'])
     dates = []
     while(True):
         new = input('Enter a date, or refuse: ')
         if new and new != 'yes' and new != 'y' and new != 'Y' and new != 'Yes':
-            dates.append(parse(new)) # user should write in year, if it is next year
+            dates.append(str(parse(new).date())) # user should write in year, if it is next year
         else:
             break
     if dates:
