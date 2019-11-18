@@ -7,7 +7,8 @@ import hashlib
 import time
 import requests
 
-HOST = 'search-freedom-elasti-tajamzilhy9i-a4vp4p7fynyjboefb2qv32fez4.us-east-1.es.amazonaws.com'
+PROD_HOST = 'search-freedom-elasti-tajamzilhy9i-a4vp4p7fynyjboefb2qv32fez4.us-east-1.es.amazonaws.com'
+DEV_HOST = 'search-freedom-elasti-bt4tf0jcyqii-kb65ab75r6ydviujronn6g7yui.us-east-1.es.amazonaws.com'
 REGION = 'us-east-1'
 SERVICE = 'es'
 
@@ -28,7 +29,7 @@ def setup_index(client, index=INDEX):
 def delete_index(client, index=INDEX):
     client.indices.delete(index=index)
 
-def client(host=HOST):
+def client(host):
     credentials = boto3.Session().get_credentials()
     awsauth = AWS4Auth(
             credentials.access_key, credentials.secret_key, REGION, SERVICE)
@@ -50,10 +51,11 @@ def snapshot_creds():
         REGION, SERVICE, 
         session_token=credentials.token)
 
-
-def register_snapshot_repo():
+# May need to re-register: S3 buckets in us-east-1 need a different label?
+# https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-managedomains-snapshots.html#es-managedomains-snapshot-registerdirectory
+def register_snapshot_repo(host):
     awsauth = snapshot_creds()
-    host = 'https://' + HOST + '/'
+    host = 'https://' + host + '/'
     path = '_snapshot/my-snapshot-repo'
     url = host + path
 
@@ -71,9 +73,25 @@ def register_snapshot_repo():
 
     return requests.put(url, auth=awsauth, json=payload, headers=headers)
 
-def take_snapshot(name):
+def take_snapshot(host, name):
     awsauth = snapshot_creds()
-    host = 'https://' + HOST + '/'
+    host = 'https://' + host + '/'
     path = '_snapshot/my-snapshot-repo/' + name
     url = host + path
     return requests.put(url, auth=awsauth)
+
+# Can also restore a specific index, see code:
+# https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-managedomains-snapshots.html#es-managedomains-snapshot-client-python
+def restore_snapshot(host, name):
+    awsauth = snapshot_creds()
+    host = 'https://' + host + '/'
+    path = '_snapshot/my-snapshot-repo/' + name + '/_restore'
+    url = host + path
+    return requests.post(url, auth=awsauth)
+
+def view_snapshots(host):
+    awsauth = snapshot_creds()
+    host = 'https://' + host + '/'
+    path = '_snapshot/my-snapshot-repo/_all?pretty'
+    url = host + path
+    return requests.get(url, auth=awsauth)
