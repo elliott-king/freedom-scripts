@@ -6,6 +6,7 @@ import os
 
 from bs4 import BeautifulSoup
 from datetime import datetime, time
+import time as timestamp
 
 headers = {
     'authority': 'q0tmlopf1j-dsn.algolia.net',
@@ -26,7 +27,14 @@ params = (
     ('x-algolia-api-key', '30a0c84a152d179ea8aa1a7a59374d08'),
 )
 
-data = '{"requests":[{"indexName":"sitecore-events","params":"query=&hitsPerPage=10&page=0&facets=%5B%22eventtype%22%2C%22seasonnumber%22%2C%22facilityfacet%22%2C%22genre%22%2C%22instrument%22%5D&tagFilters=&facetFilters=%5B%22eventtype%3ACarnegie%20Hall%20Presents%22%2C%22eventtype%3AFree%20Events%22%2C%22facilityfacet%3AOffsite%22%2C%5B%22facilityfacet%3AOffsite%22%5D%5D&numericFilters=%5B%22startdate%3E1572441713100%22%5D"},{"indexName":"sitecore-events","params":"query=&hitsPerPage=1&page=0&attributesToRetrieve=%5B%5D&attributesToHighlight=%5B%5D&attributesToSnippet=%5B%5D&tagFilters=&analytics=false&clickAnalytics=false&facets=genre&numericFilters=%5B%22startdate%3E1572441713100%22%5D&facetFilters=%5B%22eventtype%3ACarnegie%20Hall%20Presents%22%2C%22eventtype%3AFree%20Events%22%2C%22facilityfacet%3AOffsite%22%2C%5B%22facilityfacet%3AOffsite%22%5D%5D"},{"indexName":"sitecore-events","params":"query=&hitsPerPage=1&page=0&attributesToRetrieve=%5B%5D&attributesToHighlight=%5B%5D&attributesToSnippet=%5B%5D&tagFilters=&analytics=false&clickAnalytics=false&facets=facilityfacet&numericFilters=%5B%22startdate%3E1572441713100%22%5D&facetFilters=%5B%22eventtype%3ACarnegie%20Hall%20Presents%22%2C%22eventtype%3AFree%20Events%22%2C%22facilityfacet%3AOffsite%22%5D"},{"indexName":"sitecore-events","params":"query=&hitsPerPage=1&page=0&attributesToRetrieve=%5B%5D&attributesToHighlight=%5B%5D&attributesToSnippet=%5B%5D&tagFilters=&analytics=false&clickAnalytics=false&facets=instrument&numericFilters=%5B%22startdate%3E1572441713100%22%5D&facetFilters=%5B%22eventtype%3ACarnegie%20Hall%20Presents%22%2C%22eventtype%3AFree%20Events%22%2C%22facilityfacet%3AOffsite%22%2C%5B%22facilityfacet%3AOffsite%22%5D%5D"}]}'
+t = str(int(timestamp.time()))
+
+# Used to be 100 instead of 000
+data = ('{"requests":[{"indexName":"sitecore-events","params":"query=&hitsPerPage=10&page=0&facets=%5B%22eventtype%22%2C%22seasonnumber%22%2C%22facilityfacet%22%2C%22genre%22%2C%22instrument%22%5D&tagFilters=&facetFilters=%5B%22eventtype%3ACarnegie%20Hall%20Presents%22%2C%22eventtype%3AFree%20Events%22%2C%22facilityfacet%3AOffsite%22%2C%5B%22facilityfacet%3AOffsite%22%5D%5D&numericFilters=%5B%22'
+    'startdate%3E' + t + '000%22%5D"},{"indexName":"sitecore-events","params":"query=&hitsPerPage=1&page=0&attributesToRetrieve=%5B%5D&attributesToHighlight=%5B%5D&attributesToSnippet=%5B%5D&tagFilters=&analytics=false&clickAnalytics=false&facets=genre&numericFilters=%5B%22'
+    'startdate%3E' + t + '000%22%5D&facetFilters=%5B%22eventtype%3ACarnegie%20Hall%20Presents%22%2C%22eventtype%3AFree%20Events%22%2C%22facilityfacet%3AOffsite%22%2C%5B%22facilityfacet%3AOffsite%22%5D%5D"},{"indexName":"sitecore-events","params":"query=&hitsPerPage=1&page=0&attributesToRetrieve=%5B%5D&attributesToHighlight=%5B%5D&attributesToSnippet=%5B%5D&tagFilters=&analytics=false&clickAnalytics=false&facets=facilityfacet&numericFilters=%5B%22'
+    'startdate%3E' + t + '000%22%5D&facetFilters=%5B%22eventtype%3ACarnegie%20Hall%20Presents%22%2C%22eventtype%3AFree%20Events%22%2C%22facilityfacet%3AOffsite%22%5D"},{"indexName":"sitecore-events","params":"query=&hitsPerPage=1&page=0&attributesToRetrieve=%5B%5D&attributesToHighlight=%5B%5D&attributesToSnippet=%5B%5D&tagFilters=&analytics=false&clickAnalytics=false&facets=instrument&numericFilters=%5B%22'
+    'startdate%3E' + t + '000%22%5D&facetFilters=%5B%22eventtype%3ACarnegie%20Hall%20Presents%22%2C%22eventtype%3AFree%20Events%22%2C%22facilityfacet%3AOffsite%22%2C%5B%22facilityfacet%3AOffsite%22%5D%5D"}]}')
 
 def eval():
     return requests.post('https://q0tmlopf1j-dsn.algolia.net/1/indexes/*/queries', headers=headers, params=params, data=data)
