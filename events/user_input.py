@@ -61,12 +61,15 @@ def request_input(d):
         d['location'] = search_one(d['location_description'])
 
     pprint.pprint(d)
-    check_filled(d)
-    upload = input('Upload (y/N)? ')
-    if upload in ['y', 'Y', 'yes', 'Yes']:
-        events_upload.add_items_to_table(events_upload.EVENTS_TABLE, [d])
-    else:
+    
+    if not check_filled(d):
+        print ('Not uploading.')
+        return
+    upload = input('Upload (Y/n)? ')
+    if upload in ['n', 'N', 'no', 'No', 'NO']:
         print('Did not upload')
+    else:
+        events_upload.add_items_to_table(events_upload.DEV_EVENTS_TABLE, [d])
     
 # It's good if the location_description is not the possessive form
 def search_one(name):
@@ -136,4 +139,6 @@ def check_filled(d):
     for f in multi_fields + title_fields + single_fields:
         if f != 'times' and f != 'rsvp':
             if not d[f]:
-                raise TypeError('Expecting at least one value for field: ' + f)
+                print('Expecting at least one value for field: ' + f)
+                return False
+    return True
