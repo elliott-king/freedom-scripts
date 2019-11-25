@@ -37,9 +37,10 @@ def extract(freebie):
         if l.b:
             info['name'] = l.b.text
             info['website'] = l['href']
-        if 'google' in l['href'] and 'maps' in l['href'] and 'place' in l['href']:
-            info['location_description'] = l.text
-            info['host'] = links[i-1].text
+        if 'href' in l:
+            if 'google' in l['href'] and 'maps' in l['href'] and 'place' in l['href']:
+                info['location_description'] = l.text
+                info['host'] = links[i-1].text
 
     bolded = freebie.find_all('b')
     for b in bolded:

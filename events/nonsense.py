@@ -4,17 +4,16 @@ import datetime
 
 from dateutil.parser import parse
 
-TEXT = 'nonsense_11-8_11-14.txt'
-PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'nonsense', TEXT)
-
 weekdays = ['MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY','SUNDAY']
 
-def contents():
-    with open(PATH, 'r') as f:
+def contents(filename):
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'nonsense', filename)
+    with open(path, 'r') as f:
         return f.read()
 
 
-def events(s=contents()):
+def events(filename):
+    s = contents(filename)
     header = r'[X\*]{5}(.*?)[X\*]{5}'
     events = []
     start = 0
@@ -48,17 +47,23 @@ def events(s=contents()):
                         e['dates'] = str(next_dow(w, d=today))
 
             # Handling times
-            timestr = re.search(r'(.*?);', splits[-2]).group(1)
-            if '-' not in timestr:
-                e['times'] = [str(parse(timestr).time())]
-            else:
-                match = re.search(r'(.*?)-(.*)', timestr) # Need greedy: to reach end of string
-                (a, b) = match.groups()
-                if 'p' in b.lower():
-                    a += 'pm'
-                else:
-                    a += 'am'
-                e['times'] = [str(parse(a).time()), str(parse(b).time())]
+            print('splits', splits[-2])
+            if re.search(r'(.*?);', splits[-2]):
+                timestr = re.search(r'(.*?);', splits[-2]).group(1)
+
+                try:
+                    if '-' not in timestr:
+                        e['times'] = [str(parse(timestr).time())]
+                    else:
+                        match = re.search(r'(.*?)-(.*)', timestr) # Need greedy: to reach end of string
+                        (a, b) = match.groups()
+                        if 'p' in b.lower():
+                            a += 'pm'
+                        else:
+                            a += 'am'
+                        e['times'] = [str(parse(a).time()), str(parse(b).time())]
+                except ValueError as ve:
+                    print('Unable to parse time:', ve, 'For event:', e['name'])
 
             events.append(e)
     
