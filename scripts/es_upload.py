@@ -6,7 +6,8 @@ import boto3
 import hashlib
 import time
 
-HOST = 'search-publicart-o27s44277qkhxj4uh7oeph5vmq.us-east-1.es.amazonaws.com'
+PROD_HOST = 'search-publicart-o27s44277qkhxj4uh7oeph5vmq.us-east-1.es.amazonaws.com'
+DEV_HOST = 'search-freedom-elasti-y6xxgzzf17nn-potbnigh4n3ug42hygqgl6g2s4.us-east-1.es.amazonaws.com'
 REGION = 'us-east-1'
 SERVICE = 'es'
 

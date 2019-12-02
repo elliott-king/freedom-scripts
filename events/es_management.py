@@ -8,7 +8,7 @@ import time
 import requests
 
 PROD_HOST = 'search-freedom-elasti-tajamzilhy9i-a4vp4p7fynyjboefb2qv32fez4.us-east-1.es.amazonaws.com'
-DEV_HOST = 'search-freedom-elasti-bt4tf0jcyqii-kb65ab75r6ydviujronn6g7yui.us-east-1.es.amazonaws.com'
+DEV_HOST = 'search-freedom-elasti-y6xxgzzf17nn-potbnigh4n3ug42hygqgl6g2s4.us-east-1.es.amazonaws.com'
 REGION = 'us-east-1'
 SERVICE = 'es'
 

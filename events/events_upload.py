@@ -10,7 +10,7 @@ from botocore.exceptions import ClientError
 # table.update_item(Key={'id': item['id']}, UpdateExpression='set permanent = :r', ExpressionAttributeValues={':r': 'true'})
 
 EVENTS_TABLE = 'Event-cevvqsg2rzeifnuzezmiqvz3bu-freedom'
-DEV_EVENTS_TABLE = 'Event-a6x74xm4yzbhtd6svx6tarthty-events'
+DEV_EVENTS_TABLE = 'Event-lnpcytykrjgmbk5nkfbmafs6dq-events'
 
 # Helper class to convert a DynamoDB item to JSON.
 class DecimalEncoder(json.JSONEncoder):
