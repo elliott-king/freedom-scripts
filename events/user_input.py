@@ -4,7 +4,7 @@ import json
 import os
 
 from dateutil.parser import parse
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import events_upload
 
@@ -116,7 +116,19 @@ def apply_dates(d):
     while(True):
         new = input('Enter a date, or refuse: ')
         if new and new != 'yes' and new != 'y' and new != 'Y' and new != 'Yes':
-            dates.append(str(parse(new).date())) # user should write in year, if it is next year
+
+            # date range should be user-formatted start,end
+            if ',' in new:
+                [s,e] = new.split(',')
+                print(s,e)
+                s = parse(s).date()
+                e = parse(e).date()
+                print(s,e)
+                arr = [str(s + timedelta(days=x)) for x in range(0, (e - s).days + 1)]
+                print(arr)
+                dates += arr
+            else:
+                dates.append(str(parse(new).date())) # user should write in year, if it is next year
         else:
             break
     if dates:
