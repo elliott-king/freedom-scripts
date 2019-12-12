@@ -5,6 +5,7 @@ import os
 
 from dateutil.parser import parse
 from datetime import datetime, timedelta
+from titlecase import titlecase
 
 import events_upload
 
@@ -51,7 +52,7 @@ def request_input(d):
             if new and new != 'yes' and new  != 'y' and new != 'Y' and new != 'Yes':
                 d[f] = new
             if f in title_fields:
-                d[f] = d[f].title()
+                d[f] = titlecase(d[f])
 
     apply_dates(d)
     apply_times(d)
