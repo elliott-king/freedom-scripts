@@ -27,16 +27,22 @@ def add_items_to_table(table_name, items):
 
     table = dynamodb.Table(table_name)
 
+    previous = set(i['name'].lower() for i in table.scan(AttributesToGet=['name'])['Items'])
+    print(previous)
+
     for i in items:
         i['id'] = str(uuid.uuid4())
-        print('Adding event', i['name'])
+        if i['name'].lower() in previous:
+            print('Cannot add: "', i['name'], '" already exists in dynamodb.')
+        else:
+            print('Adding event', i['name'])
 
-        i = json.dumps(i, cls=DecimalEncoder)
-        # DynamoDB does not take float values.
-        i = json.loads(i, parse_float=decimal.Decimal)
+            i = json.dumps(i, cls=DecimalEncoder)
+            # DynamoDB does not take float values.
+            i = json.loads(i, parse_float=decimal.Decimal)
 
-        response = table.put_item(Item=i)
-        print('HTTP code', response['ResponseMetadata']['HTTPStatusCode'])
+            response = table.put_item(Item=i)
+            print('HTTP code', response['ResponseMetadata']['HTTPStatusCode'])
         
 def get_all_items_from_table(table_name):
     dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
