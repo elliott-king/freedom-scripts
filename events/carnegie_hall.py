@@ -45,7 +45,7 @@ def events():
     for hit in response.json()['results'][0]['hits']:
 
         info = {
-            'name': hit['title'],
+            'name': hit['title'].replace('<BR>', ' '),
             # TODO: datetime is just set as UTC..
             'dates': [str(datetime.strptime(hit['date'], '%A, %b %d, %Y').date())],
             'times': [str(timeformat(hit['time']))],
