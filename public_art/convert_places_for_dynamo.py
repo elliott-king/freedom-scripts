@@ -44,7 +44,6 @@ def get_photo(photo):
 def convert_place_object(place, place_type=_TYPE):
     location = {
         'name': place['name'],
-#        'location': place['geometry']['location'],
         'location': {
             'lat': place['geometry']['location']['lat'],
             'lon': place['geometry']['location']['lng']
@@ -63,23 +62,4 @@ def convert_place_object(place, place_type=_TYPE):
             s3_url = photo_handler.get_photo(google_url)
             location['photos'].append(s3_url)
     print("Converted place:", place['name'])
-    return location 
-
-def convert_old_dynamo_place(p):
-    location = {
-            'name': p['name'],
-#            'location': p['location'],
-            'location': {
-                'lat': p['location']['lat'],
-                'lon': p['location']['lng']
-                },
-            'createdAt': time.time(),
-            'type': p['type'],
-            'id': p['id'],
-        }
-    if 'photos' in p:
-        location['photos'] = p['photos']
-#    if p['photos']: 
-#        location['photos'].append(p['photos'][0]['link'])
-
     return location

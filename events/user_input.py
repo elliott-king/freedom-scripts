@@ -7,6 +7,7 @@ from dateutil.parser import parse
 from datetime import datetime, timedelta
 from titlecase import titlecase
 
+# TODO: fixme
 import events_upload
 
 API_URL = 'https://maps.googleapis.com/maps/api/place/'
