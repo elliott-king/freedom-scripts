@@ -6,6 +6,8 @@ import uuid
 from boto3.dynamodb.conditions import Key, Attr
 from botocore.exceptions import ClientError
 
+import legacy_support
+
 # Updating items after a full table scan.
 # table.update_item(Key={'id': item['id']}, UpdateExpression='set permanent = :r', ExpressionAttributeValues={':r': 'true'})
 
@@ -63,20 +65,29 @@ def create_table(table_name, key_column='id'):
 
     print('New table:', table_name, 'with', table.item_count, 'items.')
 
-def add_items_to_table(table_name, items):
+def add_items_to_table(table, photo_table, items):
     dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
 
-    table = dynamodb.Table(table_name)
+    table = dynamodb.Table(table)
+    photos_table = dynamodb.Table(photo_table)
 
-    for sculpture in items:
-        print('Adding sculpture', sculpture['name'])
+    for i in items:
+        if 'id' not in i:
+            i['id'] = uuid.uuid4()
+        photo = legacy_support.update_legacy_photo(i)
+        photos = i.pop('photos', None)
 
-        sculpture = json.dumps(sculpture, cls=DecimalEncoder)
+        i = json.dumps(i, cls=DecimalEncoder)
         # DynamoDB does not take float values.
-        sculpture = json.loads(sculpture, parse_float=decimal.Decimal)
+        i = json.loads(i, parse_float=decimal.Decimal)
 
-        response = table.put_item(Item=sculpture)
-        print('HTTP code', response['ResponseMetadata']['HTTPStatusCode'])
+        print('Adding location', i['name'])
+        response = table.put_item(Item=i)
+        print('Location HTTP code', response['ResponseMetadata']['HTTPStatusCode'])
+        if photo:
+            response = photos_table.put_item(Item=photo)
+            print('Photo    HTTP code', response['ResponseMetadata']['HTTPStatusCode'])
+            i['photos'] = photos
         
 def get_all_items_from_table(table_name):
     dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
@@ -84,4 +95,3 @@ def get_all_items_from_table(table_name):
     
     response = table.scan()
     return response['Items']
-
