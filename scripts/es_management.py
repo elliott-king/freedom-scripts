@@ -15,7 +15,7 @@ SERVICE = 'es'
 EVENT_INDEX = 'event'
 ART_INDEX = 'publicart'
 
-def setup_index(client, index=INDEX):
+def setup_index(client, index):
     client.indices.create(index=index)
     body = {
         "properties": {
@@ -27,7 +27,7 @@ def setup_index(client, index=INDEX):
 
     return client.indices.put_mapping(index=index, doc_type='doc', body=body)
 
-def delete_index(client, index=INDEX):
+def delete_index(client, index):
     client.indices.delete(index=index)
 
 def client(host):
@@ -45,12 +45,12 @@ def client(host):
     return es
 
 # WARN: doc type used to be '_doc'
-def index(client, document, index=INDEX):
+def index(client, document, index):
     _id = hashlib.sha1(document['name'].encode()).hexdigest()
     return client.index(index=index, doc_type='doc', id=_id, body=document)
 
 # https://elasticsearch-py.readthedocs.io/en/6.3.1/helpers.html?highlight=bulk()
-def bulk_index(client, documents, index=INDEX):
+def bulk_index(client, documents, index):
     doc_type = 'doc'
 
     def gendata():
