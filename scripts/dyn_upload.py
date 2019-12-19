@@ -19,6 +19,7 @@ PROD_EVENTS_TABLE = 'Event-cevvqsg2rzeifnuzezmiqvz3bu-freedom'
 DEV_EVENTS_TABLE = 'Event-lnpcytykrjgmbk5nkfbmafs6dq-events'
 
 DEV_PHOTOS_TABLE = 'Photo-lnpcytykrjgmbk5nkfbmafs6dq-events'
+PROD_PHOTOS_TABLE = 'Photo-cevvqsg2rzeifnuzezmiqvz3bu-freedom'
 
 # Helper class to convert a DynamoDB item to JSON.
 class DecimalEncoder(json.JSONEncoder):
