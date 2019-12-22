@@ -7,8 +7,7 @@ from dateutil.parser import parse
 from datetime import datetime, timedelta
 from titlecase import titlecase
 
-# TODO: fixme
-import events_upload
+from scripts import dyn_upload
 
 API_URL = 'https://maps.googleapis.com/maps/api/place/'
 OUTPUT = 'json'
@@ -71,7 +70,7 @@ def request_input(d):
     if upload in ['n', 'N', 'no', 'No', 'NO']:
         print('Did not upload')
     else:
-        events_upload.add_items_to_table(events_upload.DEV_EVENTS_TABLE, [d])
+        dyn_upload.add_items_to_table(dyn_upload.DEV_EVENTS_TABLE, dyn_upload.DEV_PHOTOS_TABLE, [d])
     
 # It's good if the location_description is not the possessive form
 def search_one(name):

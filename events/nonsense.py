@@ -47,7 +47,6 @@ def events(filename):
                         e['dates'] = str(next_dow(w, d=today))
 
             # Handling times
-            print('splits', splits[-2])
             if re.search(r'(.*?);', splits[-2]):
                 timestr = re.search(r'(.*?);', splits[-2]).group(1)
 

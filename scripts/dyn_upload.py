@@ -6,7 +6,7 @@ import uuid
 from boto3.dynamodb.conditions import Key, Attr
 from botocore.exceptions import ClientError
 
-import legacy_support
+from scripts import legacy_support
 
 # Updating items after a full table scan.
 # table.update_item(Key={'id': item['id']}, UpdateExpression='set permanent = :r', ExpressionAttributeValues={':r': 'true'})
@@ -74,7 +74,7 @@ def add_items_to_table(table, photo_table, items):
 
     for i in items:
         if 'id' not in i:
-            i['id'] = uuid.uuid4()
+            i['id'] = str(uuid.uuid4())
         photo = legacy_support.update_legacy_photo(i)
         photos = i.pop('photos', None)
 
@@ -96,3 +96,9 @@ def get_all_items_from_table(table_name):
     
     response = table.scan()
     return response['Items']
+
+def delete_item(item, table_name):
+    dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
+    table = dynamodb.Table(table_name)
+    
+    table.delete_item(Key={'id': item['id']})

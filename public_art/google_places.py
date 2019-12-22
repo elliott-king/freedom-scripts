@@ -2,6 +2,7 @@ import requests
 import os
 import time
 
+# TODO: wont work
 import es_upload 
 import dyn_upload
 import convert_places_for_dynamo
