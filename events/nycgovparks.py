@@ -12,33 +12,33 @@ nextpage = '/p' # plus number (counting from 2)
 
 def events():
     events = []
-    # for suffix in  [''] + [nextpage + str(x) for x in  range(2, 4)]:
-    soup = BeautifulSoup(requests.get(url + page).text, 'html.parser')
-    divs = soup.find_all('div', class_='event')
+    for suffix in  [''] + [nextpage + str(x) for x in  range(2, 4)]:
+        soup = BeautifulSoup(requests.get(url + page + suffix).text, 'html.parser')
+        divs = soup.find_all('div', class_='event')
 
-    for d in divs:
-        body = d.find('div', class_='event_body')
-        image = d.find('div', class_='span2')
-        info = {
-            'name': body.find(class_='event-title').text,
-            'host': 'NYC Parks',
-            'rsvp': False,
-            'times': [
-                str(parse(body.p.find_all('strong')[0].text).time()),
-                str(parse(body.p.find_all('strong')[1].text).time())
-            ],
-            'dates': [str(parse(d.find('div', class_='date_graphic').text).date())],
-            'website': url + body.find(class_='event-title').a.get('href'),
-            'location_description': body.find(class_='location').text,
-            'description': body.find(class_='description').text,
-            'source': url,
-        }
+        for d in divs:
+            body = d.find('div', class_='event_body')
+            image = d.find('div', class_='span2')
+            info = {
+                'name': body.find(class_='event-title').text,
+                'host': 'NYC Parks',
+                'rsvp': False,
+                'times': [
+                    str(parse(body.p.find_all('strong')[0].text).time()),
+                    str(parse(body.p.find_all('strong')[1].text).time())
+                ],
+                'dates': [str(parse(d.find('div', class_='date_graphic').text).date())],
+                'website': url + body.find(class_='event-title').a.get('href'),
+                'location_description': body.find(class_='location').text,
+                'description': body.find(class_='description').text,
+                'source': url,
+            }
 
-        if info['location_description'][:2] == 'at':
-            info['location_description'] = info['location_description'][3:]
+            if info['location_description'][:2] == 'at':
+                info['location_description'] = info['location_description'][3:]
 
-        if image and image.a:
-            info['photos']: [image.a.get('href')]
+            if image and image.a:
+                info['photos']: [image.a.get('href')]
 
-        events.append(info)
+            events.append(info)
     return events
