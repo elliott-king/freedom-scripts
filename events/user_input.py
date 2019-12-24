@@ -23,54 +23,62 @@ title_fields = [
 ]
 
 single_fields = [
-    'description','website', 'rsvp', 'source'
+    'website', 'description', 'rsvp', 'source'
     # Omit 'location', need Google for that.
     # omit photos?
 ]
 
 # should create new dict
 def request_input(d):
-    print('=' * 40)
-    missing = []
-    for f in (single_fields + title_fields):
-        if f not in d:
-            missing.append(f)
-            d[f] = None
-    for f in multi_fields:
-        if f not in d:
-            missing.append(f)
-            d[f] = []
-    print('Expected but did not find:', missing)
-    print('Text:')
-    print(d['description'])
+    try:
+        print('=' * 40)
+        missing = []
+        for f in (single_fields + title_fields):
+            if f not in d:
+                missing.append(f)
+                d[f] = None
+        for f in multi_fields:
+            if f not in d:
+                missing.append(f)
+                d[f] = []
+        print('Expected but did not find:', missing)
+        print('Text:')
+        print(d['description'])
+        if 'website' in d:
+            print(d['website'], '\n')
 
-    # Accept user input for singleton fields
-    for f in d:
-        if f not in multi_fields:
-            print(f.upper(), ':', ' ' * (20 - len(f)), d[f])
-            new = input('If applicable, new value:\n')
-            if new and new != 'yes' and new  != 'y' and new != 'Y' and new != 'Yes':
-                d[f] = new
-            if f in title_fields:
-                d[f] = titlecase(d[f])
+        # Accept user input for singleton fields
+        for f in d:
+            if f not in multi_fields:
+                print(f.upper(), ':', ' ' * (20 - len(f)), d[f])
+                new = input('If applicable, new value:\n')
+                if new and new != 'yes' and new  != 'y' and new != 'Y' and new != 'Yes':
+                    d[f] = new
+                if f in title_fields:
+                    d[f] = titlecase(d[f])
 
-    apply_dates(d)
-    apply_times(d)
-    apply_types(d)
+        apply_dates(d)
+        apply_times(d)
+        apply_types(d)
 
-    if 'location' not in d:
-        d['location'] = search_one(d['location_description'])
+        if 'location' not in d:
+            d['location'] = search_one(d['location_description'])
 
-    pprint.pprint(d)
+        pprint.pprint(d)
     
-    if not check_filled(d):
-        print ('Not uploading.')
-        return
-    upload = input('Upload (Y/n)? ')
-    if upload in ['n', 'N', 'no', 'No', 'NO']:
-        print('Did not upload')
-    else:
-        dyn_upload.add_items_to_table(dyn_upload.DEV_EVENTS_TABLE, dyn_upload.DEV_PHOTOS_TABLE, [d])
+        if not check_filled(d):
+            print ('Not uploading.')
+            return
+        upload = input('Upload (Y/n)? ')
+        if upload in ['n', 'N', 'no', 'No', 'NO']:
+            print('Did not upload')
+        else:
+            # TODO: should choose table
+            dyn_upload.add_items_to_table(dyn_upload.DEV_EVENTS_TABLE, dyn_upload.DEV_PHOTOS_TABLE, [d])
+        
+    except Exception as e:
+        print('Issue with information:', e)
+        print('Not uploading.')
     
 # It's good if the location_description is not the possessive form
 def search_one(name):
