@@ -30,7 +30,6 @@ def events():
                 'dates': [str(parse(d.find('div', class_='date_graphic').text).date())],
                 'website': url + body.find(class_='event-title').a.get('href'),
                 'location_description': body.find(class_='location').text,
-                'description': body.find(class_='description').text,
                 'source': url,
             }
 
@@ -40,5 +39,7 @@ def events():
             if image and image.a:
                 info['photos']: [image.a.get('href')]
 
+            description_page = BeautifulSoup(requests.get(info['website']).text, 'html.parser')
+            info['description'] = description_page.find(class_='description').text
             events.append(info)
     return events
