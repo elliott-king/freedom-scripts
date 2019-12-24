@@ -6,13 +6,20 @@ from bs4 import BeautifulSoup
 from datetime import datetime, time
 from dateutil.parser import parse
 
+from scripts import dyn_upload
+
 url = 'https://www.nycgovparks.org'
 page = '/events/free'
 nextpage = '/p' # plus number (counting from 2)
 
-def events():
+PROD_TABLE = dyn_upload.PROD_EVENTS_TABLE
+DEV_TABLE = dyn_upload.DEV_EVENTS_TABLE
+
+def events(table):
     events = []
-    for suffix in  [''] + [nextpage + str(x) for x in  range(2, 4)]:
+    ddb_names = set([x['name'].lower() for x in dyn_upload.get_all_items_from_table(table)])
+    scraped_names = set()
+    for suffix in  [''] + [nextpage + str(x) for x in  range(2, 10)]:
         soup = BeautifulSoup(requests.get(url + page + suffix).text, 'html.parser')
         divs = soup.find_all('div', class_='event')
 
@@ -41,5 +48,10 @@ def events():
 
             description_page = BeautifulSoup(requests.get(info['website']).text, 'html.parser')
             info['description'] = description_page.find(class_='description').text
-            events.append(info)
+
+            if info['name'].lower() not in scraped_names and info['name'].lower() not in ddb_names:
+                scraped_names.add(info['name'].lower())
+                events.append(info)
+            else:
+                print('Already scraped:', info['name'])
     return events

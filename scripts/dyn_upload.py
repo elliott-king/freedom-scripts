@@ -72,7 +72,13 @@ def add_items_to_table(table, photo_table, items):
     table = dynamodb.Table(table)
     photos_table = dynamodb.Table(photo_table)
 
+    previous = set(i['name'].lower() for i in table.scan(AttributesToGet=['name'])['Items'])
+
     for i in items:
+        if i['name'].lower() in previous:
+            print('Cannot add: "' + i['name'] + '" already exists in dynamodb')
+            continue
+
         if 'id' not in i:
             i['id'] = str(uuid.uuid4())
         photo = legacy_support.update_legacy_photo(i)
