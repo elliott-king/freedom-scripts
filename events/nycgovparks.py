@@ -1,9 +1,10 @@
 #  - https://www.nycgovparks.org/events/
 
 import requests
+import re
 
 from bs4 import BeautifulSoup
-from datetime import datetime, time
+from datetime import datetime, time, timedelta
 from dateutil.parser import parse
 
 from scripts import dyn_upload
@@ -52,14 +53,48 @@ def events(table):
             if 'photos' not in info:
                 i = description_page.find(class_='main_image')
                 if i:
-                    print('found main image')
                     i = i.find('a', href=True)
                     if i:
-                        print('found a w/ href')
                         info['photos'] = [url + i.get('href')]
+
+            dates_info = description_page.find(class_='alert')
+            if dates_info:
+                dates_info = dates_info.text
+                has_named_days, is_weekdays, is_all_days = False, False, False
+                m = re.search('between (.*) and (.*).', dates_info)
+                if m:
+                    start, end = m.groups()
+                    start, end = parse(start).date(), parse(end).date()
+
+                    days_of_week = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] # date.weekday is monday -> sunday
+                    for d in days_of_week:
+                        if d in dates_info.lower():
+                            has_named_days = True # fine
+                    if 'weekday' in dates_info:
+                        is_weekdays = True
+                    if 'every day' in dates_info:
+                        is_all_days = True
+
+                    if is_all_days: 
+                        info['dates'] = [str(start + timedelta(days=x)) for x in range(0, (end - start).days + 1)]
+                    elif is_weekdays or has_named_days:
+                        info['dates'] = []
+                        valid_days = []
+                        if is_weekdays: 
+                            valid_days = list(range(5))
+                        else:
+                            for i, d in enumerate(days_of_week):
+                                if d in dates_info.lower():
+                                    valid_days.append(i)
+                        while start <= end:
+                            if start.weekday() in valid_days:
+                                info['dates'].append(str(start))
+                            start += timedelta(1)
+
+                    else:
+                        print('Unable to parse dates_info')
+
             if info['name'].lower() not in scraped_names and info['name'].lower() not in ddb_names:
                 scraped_names.add(info['name'].lower())
                 events.append(info)
-            else:
-                print('Already scraped:', info['name'])
     return events
