@@ -44,11 +44,19 @@ def events(table):
                 info['location_description'] = info['location_description'][3:]
 
             if image and image.a:
-                info['photos']: [image.a.get('href')]
+                info['photos'] = [url + image.img.get('src')]
 
             description_page = BeautifulSoup(requests.get(info['website']).text, 'html.parser')
             info['description'] = description_page.find(class_='description').text
 
+            if 'photos' not in info:
+                i = description_page.find(class_='main_image')
+                if i:
+                    print('found main image')
+                    i = i.find('a', href=True)
+                    if i:
+                        print('found a w/ href')
+                        info['photos'] = [url + i.get('href')]
             if info['name'].lower() not in scraped_names and info['name'].lower() not in ddb_names:
                 scraped_names.add(info['name'].lower())
                 events.append(info)
