@@ -69,6 +69,8 @@ def request_input(d):
         if not check_filled(d):
             print ('Not uploading.')
             return
+        if 'http' not in d['website']:
+            d['website'] = 'https://' + d['website']
         upload = input('Upload (Y/n)? ')
         if upload in ['n', 'N', 'no', 'No', 'NO']:
             print('Did not upload')

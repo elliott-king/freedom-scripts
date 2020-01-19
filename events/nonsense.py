@@ -33,18 +33,20 @@ def events(filename):
                 'description': '\n'.join(splits[5:]),
                 'rsvp': 'rsvp' in text.lower() or 'registration' in text.lower()
             }
+            if 'http' not in e['website']:
+                e['website'] = 'https://www.' + e['website']
             if splits[-4].strip():
                 e['host'] = splits[-4]
             
             # Handling dates
             h = re.match(header, text).group(1).strip()
             try:    
-                e['dates'] = str(parse(h).date())
+                e['dates'] = [str(parse(h).date())]
             except ValueError:
                 today = datetime.date.today()
                 for w in weekdays:
                     if w in h:
-                        e['dates'] = str(next_dow(w, d=today))
+                        e['dates'] = [str(next_dow(w, d=today))]
 
             # Handling times
             if re.search(r'(.*?);', splits[-2]):
