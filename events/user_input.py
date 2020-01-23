@@ -160,7 +160,7 @@ def apply_types(d):
 
 def check_filled(d):
     for f in multi_fields + title_fields + single_fields:
-        if f != 'times' and f != 'rsvp':
+        if f not in['rsvp', 'times', 'source']:
             if not d[f]:
                 print('Expecting at least one value for field: ' + f)
                 return False
