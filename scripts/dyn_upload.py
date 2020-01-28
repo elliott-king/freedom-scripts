@@ -21,6 +21,7 @@ DEV_EVENTS_TABLE = 'Event-lnpcytykrjgmbk5nkfbmafs6dq-events'
 DEV_PHOTOS_TABLE = 'Photo-lnpcytykrjgmbk5nkfbmafs6dq-events'
 PROD_PHOTOS_TABLE = 'Photo-cevvqsg2rzeifnuzezmiqvz3bu-freedom'
 
+
 # Helper class to convert a DynamoDB item to JSON.
 class DecimalEncoder(json.JSONEncoder):
     def default(self, o):
@@ -65,17 +66,43 @@ def create_table(table_name, key_column='id'):
         )
 
     print('New table:', table_name, 'with', table.item_count, 'items.')
+        
+def get_all_items_from_table(table_name):
+    dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
+    table = dynamodb.Table(table_name)
+    
+    response = table.scan()
+    return response['Items']
 
-def add_items_to_table(table, photo_table, items):
+def delete_item(item, table_name):
+    dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
+    table = dynamodb.Table(table_name)
+    
+    table.delete_item(Key={'id': item['id']})
+
+PAIRS = {}
+PAIRS[DEV_EVENTS_TABLE]= dict([(x['name'].lower(), x['dates']) for x in get_all_items_from_table(DEV_EVENTS_TABLE)])
+PAIRS[PROD_EVENTS_TABLE]= dict([(x['name'].lower(), x['dates']) for x in get_all_items_from_table(PROD_EVENTS_TABLE)])
+# TODO: no public art handled atm
+
+# TODO: handle public arts as well
+def is_uploaded(location, table=DEV_EVENTS_TABLE):
+    pairs = PAIRS[table]
+    
+    if location['name'].lower() in pairs:
+        if pairs[location['name'].lower()] == location['dates']:
+            print('Already added', location['source'], 'event:', location['name'], 'with date', location['dates'])
+            return True
+    return False
+
+def add_items_to_table(table_name, photo_table_name, items):
     dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
 
-    table = dynamodb.Table(table)
-    photos_table = dynamodb.Table(photo_table)
-
-    previous = set(i['name'].lower() for i in table.scan(AttributesToGet=['name'])['Items'])
+    table = dynamodb.Table(table_name)
+    photos_table = dynamodb.Table(photo_table_name)
 
     for i in items:
-        if i['name'].lower() in previous:
+        if is_uploaded(i, table_name):
             print('Cannot add: "' + i['name'] + '" already exists in dynamodb')
             continue
 
@@ -95,16 +122,3 @@ def add_items_to_table(table, photo_table, items):
             response = photos_table.put_item(Item=photo)
             print('Photo    HTTP code', response['ResponseMetadata']['HTTPStatusCode'])
             i['photos'] = photos
-        
-def get_all_items_from_table(table_name):
-    dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
-    table = dynamodb.Table(table_name)
-    
-    response = table.scan()
-    return response['Items']
-
-def delete_item(item, table_name):
-    dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
-    table = dynamodb.Table(table_name)
-    
-    table.delete_item(Key={'id': item['id']})

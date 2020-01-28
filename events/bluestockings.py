@@ -40,11 +40,6 @@ def events(table=dyn_upload.DEV_EVENTS_TABLE):
             info['dates'] = [str(parse(d).date())]
             info['times'] = [str(parse(t).time())]
 
-            if info['name'].lower() in ddb_names:
-                if ddb_names[info['name'].lower()] == info['dates']:
-                    print('Already added bluestockings event:', info['name'], 'with date', info['dates'])
-                else:
-                    events.append(info)
-            else:
+            if not dyn_upload.is_uploaded(info, table):
                 events.append(info)
     return events
