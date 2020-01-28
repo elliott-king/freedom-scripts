@@ -2,6 +2,7 @@ import pprint
 import requests
 import json
 import os
+import traceback
 
 from dateutil.parser import parse
 from datetime import datetime, timedelta
@@ -65,7 +66,7 @@ def request_input(d):
             d['location'] = search_one(d['location_description'])
 
         pprint.pprint(d)
-    
+
         if not check_filled(d):
             print ('Not uploading.')
             return
@@ -77,10 +78,10 @@ def request_input(d):
         else:
             # TODO: should choose table
             dyn_upload.add_items_to_table(dyn_upload.DEV_EVENTS_TABLE, dyn_upload.DEV_PHOTOS_TABLE, [d])
-        
+    
     except Exception as e:
-        print('Issue with information:', e)
-        print('Not uploading.')
+        print(traceback.format_exc())
+        print('Issue with information, NOT UPLOADING')
     
 # It's good if the location_description is not the possessive form
 def search_one(name):
