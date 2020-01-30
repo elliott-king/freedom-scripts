@@ -81,16 +81,17 @@ def delete_item(item, table_name):
     table.delete_item(Key={'id': item['id']})
 
 PAIRS = {}
-PAIRS[DEV_EVENTS_TABLE]= dict([(x['name'].lower(), x['dates']) for x in get_all_items_from_table(DEV_EVENTS_TABLE)])
-PAIRS[PROD_EVENTS_TABLE]= dict([(x['name'].lower(), x['dates']) for x in get_all_items_from_table(PROD_EVENTS_TABLE)])
+PAIRS[DEV_EVENTS_TABLE]= dict([(x['name'].lower(), {'dates': x['dates'], 'host': x.get('host', None)}) for x in get_all_items_from_table(DEV_EVENTS_TABLE)])
+PAIRS[PROD_EVENTS_TABLE]= dict([(x['name'].lower(), {'dates': x['dates'], 'host': x.get('host', None)}) for x in get_all_items_from_table(PROD_EVENTS_TABLE)])
 # TODO: no public art handled atm
 
 # TODO: handle public arts as well
 def is_uploaded(location, table=DEV_EVENTS_TABLE):
     pairs = PAIRS[table]
     
-    if location['name'].lower() in pairs:
-        if pairs[location['name'].lower()] == location['dates']:
+    name = location['name'].lower()
+    if name in pairs:
+        if location['dates'] == pairs[name]['dates'] and location['host'] == pairs[name]['host']:
             print('Already added', location['source'], 'event:', location['name'], 'with date', location['dates'])
             return True
     return False

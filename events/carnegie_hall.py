@@ -8,6 +8,8 @@ from bs4 import BeautifulSoup
 from datetime import datetime, time
 import time as timestamp
 
+from scripts import dyn_upload
+
 headers = {
     'authority': 'q0tmlopf1j-dsn.algolia.net',
     'accept': 'application/json',
@@ -39,7 +41,7 @@ data = ('{"requests":[{"indexName":"sitecore-events","params":"query=&hitsPerPag
 def eval():
     return requests.post('https://q0tmlopf1j-dsn.algolia.net/1/indexes/*/queries', headers=headers, params=params, data=data)
 
-def events():
+def events(table=dyn_upload.DEV_EVENTS_TABLE):
     response = eval()
     i = []
     for hit in response.json()['results'][0]['hits']:
@@ -67,7 +69,8 @@ def events():
         location_text = ' '.join(location_text.strip().split('\n')[2:-1])
         description_text = description_text.strip()
         info['description'] = description_text
-        i.append(info)
+        if not dyn_upload.is_uploaded(info, table):
+            i.append(info)
     return i
 
 def timeformat(t):
