@@ -5,6 +5,7 @@ import uuid
 
 from boto3.dynamodb.conditions import Key, Attr
 from botocore.exceptions import ClientError
+from collections import defaultdict
 
 from scripts import legacy_support
 
@@ -81,19 +82,29 @@ def delete_item(item, table_name):
     table.delete_item(Key={'id': item['id']})
 
 PAIRS = {}
-PAIRS[DEV_EVENTS_TABLE]= dict([(x['name'].lower(), {'dates': x['dates'], 'host': x.get('host', None)}) for x in get_all_items_from_table(DEV_EVENTS_TABLE)])
-PAIRS[PROD_EVENTS_TABLE]= dict([(x['name'].lower(), {'dates': x['dates'], 'host': x.get('host', None)}) for x in get_all_items_from_table(PROD_EVENTS_TABLE)])
+# TODO: should correspond to list for each event
+PAIRS[DEV_EVENTS_TABLE] = defaultdict(list)
+for e in get_all_items_from_table(DEV_EVENTS_TABLE):
+    name = e['name'].lower().strip()
+    PAIRS[DEV_EVENTS_TABLE][name].append({'dates': set(e['dates']), 'host': e.get('host', None)})
+PAIRS[PROD_EVENTS_TABLE] = defaultdict(list)
+for e in get_all_items_from_table(PROD_EVENTS_TABLE):
+    name = e['name'].lower().strip()
+    PAIRS[PROD_EVENTS_TABLE][name].append({'dates': set(e['dates']), 'host': e.get('host', None)})
 # TODO: no public art handled atm
 
 # TODO: handle public arts as well
 def is_uploaded(location, table=DEV_EVENTS_TABLE):
     pairs = PAIRS[table]
     
-    name = location['name'].lower()
+    name = location['name'].lower().strip()
     if name in pairs:
-        if location['dates'] == pairs[name]['dates'] and location['host'] == pairs[name]['host']:
-            print('Already added', location['source'], 'event:', location['name'], 'with date', location['dates'])
-            return True
+        if 'dates' in location and 'host' in location:
+            d = set(location['dates'])
+            for p in pairs[name]:
+                if not d.isdisjoint(p['dates']) and p['host'] == location['host']:
+                    print('Already added', location['source'], 'event:', location['name'], 'with date', location['dates'])
+                    return True
     return False
 
 def add_items_to_table(table_name, photo_table_name, items):
@@ -122,4 +133,4 @@ def add_items_to_table(table_name, photo_table_name, items):
         if photo:
             response = photos_table.put_item(Item=photo)
             print('Photo    HTTP code', response['ResponseMetadata']['HTTPStatusCode'])
-            i['photos'] = photos
+            i['photos'] = photos # seems unnecessary
