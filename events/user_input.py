@@ -45,6 +45,8 @@ def request_input(d):
         print('Expected but did not find:', missing)
         print('Text:')
         print(d['description'])
+        if d['website'] and len(d['website']) < 6:
+            del d['website']
         if 'website' in d:
             print(d['website'], '\n')
 
@@ -70,7 +72,7 @@ def request_input(d):
         if not check_filled(d):
             print ('Not uploading.')
             return
-        if 'http' not in d['website']:
+        if 'website' in d and 'http' not in d['website']:
             d['website'] = 'https://' + d['website']
         upload = input('Upload (Y/n)? ')
         if upload in ['n', 'N', 'no', 'No', 'NO']:
