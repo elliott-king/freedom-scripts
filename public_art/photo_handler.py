@@ -12,9 +12,9 @@ name_to_extension = {
         }
 
 client = boto3.client('s3')
-bucket = 'freedom-js-appb7dc6789c3d248c18c4e34a5eb639543-freedom'
+events_bucket = 'freedom-js-appb7dc6789c3d248c18c4e34a5eb639543-events'
 
-def get_photo(url):
+def get_photo(url, bucket=events_bucket):
     name = uuid.uuid4()
     r = requests.get(url, stream=True)
     with open('photos/' + str(name), 'wb') as out_file:

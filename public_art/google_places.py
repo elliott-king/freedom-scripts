@@ -2,10 +2,8 @@ import requests
 import os
 import time
 
-# TODO: wont work
-import es_upload 
-import dyn_upload
-import convert_places_for_dynamo
+from scripts import dyn_upload
+from public_art import convert_places_for_dynamo
 
 URL = 'https://maps.googleapis.com/maps/api/place/'
 OUTPUT = 'json'
@@ -13,7 +11,7 @@ OUTPUT = 'json'
 # Maybe store elsewhere on disk
 KEY = 'AIzaSyCZ21RlCa8IVwxR-58b8fTgUXn_a4UYhbc'
 INPUTTYPE = 'textquery'
-PUBLIC_ART_FILE = '../public_art.json'
+PUBLIC_ART_TABLE = 'PublicArt-lnpcytykrjgmbk5nkfbmafs6dq-events'
 
 search_query = 'sculpture'
 recommended_queries = ['sculpture', 'mural']
@@ -89,14 +87,14 @@ def search_nearby(origin_location=fh_origin, query=search_query):
 
     return results
 
-def search_and_upload(origin_location, query=search_query):
+def search_and_upload(origin_location, query=search_query, table=PUBLIC_ART_TABLE):
     validate_query(query)
     items_from_google = search_nearby(origin_location, query=query)
     # Something from google w/out a photo is likely useless.
     items_from_google = [i for i in items_from_google if 'photos' in i]
     print(f"Pulled {len(items_from_google)} items from google places api.")
 
-    from_dynamo = dyn_upload.get_all_items_from_table('PublicArt-cevvqsg2rzeifnuzezmiqvz3bu-freedom')
+    from_dynamo = dyn_upload.get_all_items_from_table(table)
     names = set()
     for item in from_dynamo:
         if item['type'] == query:
@@ -105,4 +103,4 @@ def search_and_upload(origin_location, query=search_query):
     for item in items_from_google:
         if item['name'] not in names:
             item = convert_places_for_dynamo.convert_place_object(item, place_type=query)
-            dyn_upload.add_items_to_table('PublicArt-cevvqsg2rzeifnuzezmiqvz3bu-freedom', [item])
+            dyn_upload.add_items_to_table(dyn_upload.DEV_ART_TABLE, dyn_upload.DEV_PHOTOS_TABLE, [item])
