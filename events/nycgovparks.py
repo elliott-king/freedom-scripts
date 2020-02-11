@@ -8,15 +8,14 @@ from datetime import datetime, time, timedelta
 from dateutil.parser import parse
 
 from scripts import dyn_upload
+from events import utils
 
 url = 'https://www.nycgovparks.org'
 page = '/events/free'
 nextpage = '/p' # plus number (counting from 2)
 
-PROD_TABLE = dyn_upload.PROD_EVENTS_TABLE
-DEV_TABLE = dyn_upload.DEV_EVENTS_TABLE
 
-def events(table):
+def events(table=dyn_upload.DEV_EVENTS_TABLE):
     events = []
     ddb_names = set([x['name'].lower() for x in dyn_upload.get_all_items_from_table(table)])
     scraped_names = set()
@@ -39,6 +38,7 @@ def events(table):
                 'website': url + body.find(class_='event-title').a.get('href'),
                 'location_description': body.find(class_='location').text,
                 'source': url,
+                'types': [],
             }
 
             if info['location_description'][:2] == 'at':
@@ -49,6 +49,8 @@ def events(table):
 
             description_page = BeautifulSoup(requests.get(info['website']).text, 'html.parser')
             info['description'] = description_page.find(class_='description').text
+            if 'rsvp' in info['description'].lower() or 'regist' in info['description'].lower():
+                info['rsvp'] = True
 
             if 'photos' not in info:
                 i = description_page.find(class_='main_image')
@@ -56,6 +58,12 @@ def events(table):
                     i = i.find('a', href=True)
                     if i:
                         info['photos'] = [url + i.get('href')]
+
+            utils.add_type(info, 'athletics', ['athletics', 'exercise', 'fitness', 'physique', 'aerobics'])
+            utils.add_type(info, 'crafts', ['craft', 'coloring', 'knitting', 'sculpt', 'creative writing'])
+            utils.add_type(info, 'teen', ['teen', 'tween', 'homework'])
+            utils.add_type(info, 'family', ['toddler', 'preschool', 'baby', 'child', 'family', 'pre-school', 'families', 'kids'])
+            utils.add_type(info, 'nature', ['audobon', 'bird wa', 'nature'])
 
             dates_info = description_page.find(class_='alert')
             if dates_info:
