@@ -23,7 +23,7 @@ import time
 import requests 
 import uuid
 
-import photo_handler
+from public_art import photo_handler
 
 # TODO: can't yet handle array of types
 # _TYPES = ['sculpture', 'public']
