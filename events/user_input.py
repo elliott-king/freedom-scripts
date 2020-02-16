@@ -57,8 +57,14 @@ def request_input(d):
                 new = input('If applicable, new value:\n')
                 if new and new != 'yes' and new  != 'y' and new != 'Y' and new != 'Yes':
                     d[f] = new
+                    if f.lower() == 'rsvp':
+                        d[f] = d[f] == 'True'
                 if f in title_fields:
                     d[f] = titlecase(d[f])
+
+        # Eliminate dupes
+        # TODO: some nypl events have multiple times w/in one day
+        d['dates'] = list(set(d['dates']))
 
         apply_dates(d)
         apply_times(d)
@@ -163,7 +169,7 @@ def apply_types(d):
 
 def check_filled(d):
     for f in multi_fields + title_fields + single_fields:
-        if f not in['rsvp', 'times', 'source']:
+        if f not in['rsvp', 'times', 'source', 'website']:
             if not d[f]:
                 print('Expecting at least one value for field: ' + f)
                 return False
