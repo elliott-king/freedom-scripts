@@ -14,15 +14,27 @@ SERVICE = 'es'
 EVENT_INDEX = 'event'
 ART_INDEX = 'publicart'
 
-def setup_index(client, index):
+def setup_index(client, index): # TODO: change type of 'times'
     client.indices.create(index=index)
     body = {
         "properties": {
             "location": { "type": "geo_point"},
-            "dates": { "type": "date"},
-            "times": { "type": "text"}
         }
     }
+    
+    # We use keyword because this allows us to search by a specific word.
+    # Otherwise, ES approximates/uses fuzzy searching on everything.
+    if index == EVENT_INDEX:
+        body["properties"]["dates"] = { "type": "date"}
+        body["properties"]["host"] = { "type": "keyword"}
+        body["properties"]["source"] = { "type": "keyword"}
+        body["properties"]["rsvp"] = { "type": "boolean"}
+        body["properties"]["types"] = { "type": "keyword"}
+
+    if index == ART_INDEX:
+        body["properties"]["date_added"] = { "type": "date"}
+        body["properties"]["permanent"] = { "type": "boolean"}
+        body["properties"]["type"] = { "type": "keyword"}
 
     return client.indices.put_mapping(index=index, doc_type='doc', body=body)
 
@@ -54,7 +66,7 @@ def bulk_index(client, documents, index):
 
     def gendata():
         for doc in documents:
-            doc = dyn_document_to_es_document(doc)
+            # doc = dyn_document_to_es_document(doc)
             yield {
                     '_id': hashlib.sha1(doc['name'].encode()).hexdigest(),
                     '_index': index,
