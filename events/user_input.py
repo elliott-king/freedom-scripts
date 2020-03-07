@@ -79,7 +79,7 @@ def request_input(d):
             print ('Not uploading.')
             return
         if 'website' in d and 'http' not in d['website']:
-            d['website'] = 'https://' + d['website']
+            d['website'] = 'http://' + d['website']
         upload = input('Upload (Y/n)? ')
         if upload in ['n', 'N', 'no', 'No', 'NO']:
             print('Did not upload')
@@ -170,7 +170,7 @@ def apply_types(d):
 def check_filled(d):
     for f in multi_fields + title_fields + single_fields:
         if f not in['rsvp', 'times', 'source', 'website']:
-            if not d[f]:
+            if f not in d or not d[f]:
                 print('Expecting at least one value for field: ' + f)
                 return False
     return True
