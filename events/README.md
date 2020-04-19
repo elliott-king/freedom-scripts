@@ -1,3 +1,11 @@
+## Usage
+python3 -> for each source you are interested in:
+from events import user_input
+from events import source
+events = source.events()
+for e in events:
+  user_input.request_input(e)
+
 ## aggregators:
  - https://www.nonsensenyc.com/
  - https://bestnewyorkcomedy.com/
@@ -26,6 +34,7 @@
  - pioneer works
  - queens public library
  - brooklyn public library
+ - the orbit
 
  ## Shoutout: 
  - u/thivnav for flushing town hall
