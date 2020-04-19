@@ -63,7 +63,24 @@ def events(table=dyn_upload.DEV_EVENTS_TABLE):
             utils.add_type(info, 'crafts', ['craft', 'coloring', 'knitting', 'sculpt', 'creative writing'])
             utils.add_type(info, 'teen', ['teen', 'tween', 'homework'])
             utils.add_type(info, 'family', ['toddler', 'preschool', 'baby', 'child', 'family', 'pre-school', 'families', 'kids'])
-            utils.add_type(info, 'nature', ['audobon', 'bird wa', 'nature'])
+            utils.add_type(info, 'nature', ['audobon', 'bird wa', 'nature', 'hike'])
+            utils.add_type(info, 'science', ['geolog', 'biolog'])
+            utils.add_type(info, 'advocacy', ['volunteer'])
+
+            cat_header = None
+            for h3 in description_page.find_all('h3'):
+                if h3.text == 'Categories':
+                    cat_header = h3
+            if cat_header:
+                categories_list = cat_header.next_sibling.text.split()
+                # "Best for kids"
+                exceptions = set(['art', 'games', 'education', 'senior'])
+                for t in utils.EVENT_TYPES:
+                    if t not in exceptions:
+                        for c in categories_list:
+                            if t in c.lower():
+                                if t not in info['types']:
+                                    info['types'].append(t)
 
             dates_info = description_page.find(class_='alert')
             if dates_info:

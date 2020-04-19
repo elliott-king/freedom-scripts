@@ -103,19 +103,23 @@ def events(table=dyn_upload.DEV_EVENTS_TABLE):
                             location_api, 
                             os.path.basename(os.path.normpath(
                                 eventpage.find('div', class_='event-location').a.get('href'))))
-                        library = requests.get(libraryUrl).json()
-                        if 'location' in library:
-                            library = library['location']
-                            info['location_description'] = ''.join([
-                                library['street_address'], ', ',
-                                library['locality'], ', ',
-                                library['region'],
-                            ])
-                            if 'host' not in info:
-                                info['host'] = library['name']
-                        else:
-                            print('No api location json for library', info['website'])
-                scrape_dates(info, eventpage)
+                        try:
+                            library = requests.get(libraryUrl).json()
+                            if 'location' in library:
+                                library = library['location']
+                                info['location_description'] = ''.join([
+                                    library['street_address'], ', ',
+                                    library['locality'], ', ',
+                                    library['region'],
+                                ])
+                                if 'host' not in info:
+                                    info['host'] = library['name']
+                            else:
+                                print('No api location json for library', info['website'])
+                        except Exception as e:
+                            print('Could not access api for library:', eventpage.find('div', class_='event-location').a.text)
+                if not scrape_dates(info, eventpage):
+                    continue
                 add_types(info)
 
                 if not dyn_upload.is_uploaded(info, table) and not utils.in_prev_parsed_events(prev_events, info):
@@ -131,24 +135,25 @@ def add_types(info):
 
     # TODO: if has type film, remove other types?
 
-    utils.add_type(info, 'family', ['toddler', 'preschool', 'baby', 'babies', 'child', 'family', 'pre-school', 'families', 'kids', 'toys', 'story time', 'storytime', 'pre-k', 'open play', ' stem ', 'youngster', 'kidz', 'parent'])
-    utils.add_type(info, 'music', ['jazz', 'music', 'song', 'concert', 'opera', 'baroque', 'fugue', 'choral'])
+    utils.add_type(info, 'family', ['toddler', 'preschool', 'baby', 'babies', 'child', 'family', 'pre-school', 'families', 'kids', 'toys', 'story time', 'storytime', 'pre-k', 'open play', ' stem ', 'youngster', 'kidz', 'parent', 'early literacy'])
+    utils.add_type(info, 'music', ['jazz', 'music', 'song', 'concert', 'opera', 'baroque', 'fugue', 'choral', 'quartet', 'karaoke'])
     utils.add_type(info, 'film', ['film', 'movie', 'matinee', 'cinema', 'screening'])
     utils.add_type(info, 'crafts', ['craft', 'coloring', 'knitting', 'sculpt', 'creative writing', 'sewing', 'materials', 'crochet', 'button', 'collage', 'felt ', 'perler', 'origami', 'supplies', 'beads', 'jewelry', 'create your own'])
-    utils.add_type(info, 'games', ['jigsaw', 'puzzle', 'boardgame', 'video games', 'card game', 'dungeons & dragons', 'gaming', 'ps4', 'nintendo switch', 'xbox', 'game', 'crossword', ' uno', 'lego ', 'legos', 'mah jong', 'chess', 'wii', 'scrabble'])
+    utils.add_type(info, 'games', ['jigsaw', 'puzzle', 'boardgame', 'video games', 'card game', 'dungeons & dragons', 'gaming', 'ps4', 'nintendo switch', 'xbox', 'game', 'crossword', ' uno', 'lego ', 'legos', 'mah jong', 'mahjong', 'chess', 'wii', 'scrabble', 'bingo'])
     utils.add_type(info, 'advocacy', ['awareness', 'council member', 'citizenship'])
     utils.add_type(info, 'science', [' stem ', 'robot', ' steam '])
     utils.add_type(info, 'technology', [])
     utils.add_type(info, 'literature', ['literature', 'book discussion', 'book club', 'poem', 'poetry', 'reading and discussion', 'read and discuss'])
     # Tech things are really all classes: eg, learn CSS
-    utils.add_type(info, 'education', ['learn how to', 'learn to', 'teach you', 'edit text', 'practice', 'research', 'job application', 'tutor', 'education', 'covers the basics', 'cover the basics', 'computer', 'css', 'html', 'technolog', 'blogging', 'edit text', 'tech issue', 'bilingual', 'photoshop', 'job seeker', 'resume build', 'application', 'microsoft', 'downloading', 'intro to', 'introduction to', 'your resume', 'job search', 'career', 'database', 'excel genius', 'census', 'classroom'])
-    utils.add_type(info, 'health_medical', ['hygiene', 'mental health', 'first aid', 'disease', 'healthcare', 'health care', 'medical'])
+    utils.add_type(info, 'education', ['learn how to', 'learn to', 'teach you', 'edit text', 'practice', 'research', 'job application', 'tutor', 'education', 'covers the basics', 'cover the basics', 'computer', 'css', 'html', 'technolog', 'blogging', 'edit text', 'tech issue', 'bilingual', 'photoshop', 'job seeker', 'resume build', 'application', 'microsoft', 'downloading', 'intro to', 'introduction to', 'your resume', 'job search', 'career', 'database', 'excel genius', 'census', 'classroom', 'writer\'s circle'])
+    utils.add_type(info, 'health_medical', ['hygiene', 'mental health', 'first aid', 'disease', 'healthcare', 'health care', 'medical', 'wellness'])
     utils.add_type(info, 'senior', [' aging', 'seniors', 'aarp'])
     utils.add_type(info, 'athletics', ['athletics', 'exercise', 'fitness', 'physique', 'aerobics', 'sports', 'yoga'])
     utils.add_type(info, 'teen', ['teen', 'tween', 'homework', 'student', 'college', 'manga', 'anime', 'youth'])
     utils.add_type(info, 'history', ['history', 'historic'])
     utils.add_type(info, 'comedy', ['comed'])
 
+    # TODO: 'all ages'
     def check_age_range(start, end):
         start = int(start)
         if start < 11:
@@ -229,7 +234,10 @@ def scrape_dates(info, eventpage):
             print('ERROR getting date, not type of div or ul')
 
     # TODO: handle more than one time?
+    cancellations = 0
     for s in datestrs:
+        if 'cancel' in s.lower():
+            cancellations += 1
         try:
             d = parse(s)
             info['dates'].append(str(d.date()))
@@ -237,6 +245,11 @@ def scrape_dates(info, eventpage):
         except Exception as e:
             print("Unable to parse date for ", info['website'])
             print(e)
+    
+    if cancellations >= len(datestrs):
+        print('Event cancelled: ', info['name'])
+        return False 
+    return True
 
 # Ease of doing user_input. TODO: should be sunsetted
 def reddit_oriented(event):

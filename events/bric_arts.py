@@ -25,6 +25,8 @@ def events(table=dyn_upload.DEV_EVENTS_TABLE):
             'photos': article.find('img', class_='lazyload').get('src'),
             'source': 'BRIC',
             'rsvp': False,
+            'dates': [],
+            'times': [],
         }
         if article.find(class_='listing-body').text:
             event['description'] = article.find(class_='listing-body').text
@@ -38,11 +40,15 @@ def events(table=dyn_upload.DEV_EVENTS_TABLE):
                     # TODO: should really check what time it was
                     # But I am lazy
                     d += 'pm'
-                d = parse(d)
-                event['dates'] = [str(d.date())]
-                event['times'] = [str(d.time())]
+                try:
+                    d = parse(d)
+                    event['dates'] = [str(d.date())]
+                    event['times'] = [str(d.time())]
+                except Exception as e:
+                    print('Unable to parse:', d)
             if 'Cost' in right_item.text:
-                if 'free' not in right_item.text.lower():
+                # TODO: NEED TO ADD CHECK FOR THIS IN ALL CASES!!!
+                if 'free ' not in right_item.text.lower(): # TODO: 'free' or 'free '?
                     continue
                 if 'rsvp' in right_item.text.lower() or 'regist' in right_item.text.lower():
                     event['rsvp'] = True
@@ -55,7 +61,7 @@ def events(table=dyn_upload.DEV_EVENTS_TABLE):
             if 'rsvp' in link.text.lower() or 'regist' in link.text.lower():
                 event['rsvp'] = True
 
-        if not dyn_upload.is_uploaded(event, table) and not utils.in_prev_parsed_events(prev_events, event):
+        if 'host' in event and not dyn_upload.is_uploaded(event, table) and not utils.in_prev_parsed_events(prev_events, event):
             events.append(event)
             utils.add_to_prev_events(prev_events, event)
     return events

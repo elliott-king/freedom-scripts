@@ -8,7 +8,9 @@ import os
 
 from bs4 import BeautifulSoup
 
-def events():
+from scripts import dyn_upload
+
+def events(table=dyn_upload.DEV_EVENTS_TABLE):
     ret = []
     response = requests.get('https://theskint.com/ongoing-events/')
 
@@ -33,7 +35,8 @@ def events():
                     d['location_description'] = description
                     d['host'] = description
 
-                ret.append(d)
+                if not dyn_upload.is_uploaded(d, table):
+                    ret.append(d)
 
     return ret
 
