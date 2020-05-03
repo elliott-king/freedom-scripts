@@ -29,6 +29,15 @@ class SkipEventError(Exception):
     def __init__(self, message):
         self.message = message
 
+e = None # TODO: hacky, but useful to access this if we ctrl-c
+def request_multiple(events):
+    events = events[::-1]
+    while len(events) > 0:
+        global e 
+        e = events.pop()
+        # TODO: skip event if not reddit-approved
+        request_input(e)
+
 # should create new dict
 def request_input(d):
     print('=' * 40)
