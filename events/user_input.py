@@ -22,6 +22,8 @@ single_fields = [
     # omit photos?
 ]
 
+IN_QUARANTINE = True
+
 class SkipEventError(Exception):
     """Signify that user would like to skip this event."""
     def __init__(self, message):
@@ -31,6 +33,8 @@ class SkipEventError(Exception):
 def request_input(d):
     if 'id' in d:
         del d['id']
+    if IN_QUARANTINE:
+        d['location_description'] = 'Manhattan'
     try:
         print('=' * 40)
         if d['website'] and len(d['website']) < 6:
