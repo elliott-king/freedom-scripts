@@ -22,6 +22,11 @@ single_fields = [
     # omit photos?
 ]
 
+class SkipEventError(Exception):
+    """Signify that user would like to skip this event."""
+    def __init__(self, message):
+        self.message = message
+
 # should create new dict
 def request_input(d):
     if 'id' in d:
@@ -49,14 +54,16 @@ def request_input(d):
             return
         if 'website' in d and 'http' not in d['website']:
             d['website'] = 'http://' + d['website']
-        upload = input('Upload (Y/n)? ')
+        upload = get_user_input('Upload (Y/n)? ')
         if upload in ['n', 'N', 'no', 'No', 'NO']:
             print('Did not upload')
         else:
             # TODO: should choose table
             dyn_upload.add_items_to_table(dyn_upload.DEV_EVENTS_TABLE, dyn_upload.DEV_PHOTOS_TABLE, [d])
     
-    except Exception as e:
+    except SkipEventError:
+        print('Skipping this event')
+    except Exception:
         print(traceback.format_exc())
         print('Issue with information, NOT UPLOADING')
 
@@ -82,7 +89,7 @@ def singleton_fields(d):
     for f in d:
         if f not in multi_fields:
             print(f.upper(), ':', ' ' * (20 - len(f)), d[f])
-            new = input('If applicable, new value:\n')
+            new = get_user_input('If applicable, new value:\n')
             if new and new != 'yes' and new  != 'y' and new != 'Y' and new != 'Yes':
                 d[f] = new
                 if f.lower() == 'rsvp':
@@ -126,7 +133,7 @@ def apply_times(d):
     print('times:', d['times'])
     times = []
     while(True):
-        new = input('Enter a time, or refuse: ')
+        new = get_user_input('Enter a time, or refuse: ')
         if new and new != 'yes' and new != 'y' and new != 'Y' and new != 'Yes':
             times.append(str(parse(new).time()))
         else:
@@ -141,7 +148,7 @@ def apply_dates(d):
     print('dates:', d['dates'])
     dates = []
     while(True):
-        new = input('Enter a date, or refuse: ')
+        new = get_user_input('Enter a date, or refuse: ')
         if new and new != 'yes' and new != 'y' and new != 'Y' and new != 'Yes':
 
             # date range should be user-formatted start,end
@@ -165,7 +172,7 @@ def apply_types(d):
     print('types:', d['types'])
     types = []
     while(True):
-        new = input('Enter a type, or refuse: ')
+        new = get_user_input('Enter a type, or refuse: ')
         if new and new != 'yes' and new != 'y' and new != 'Y' and new != 'Yes':
             types.append(new)
         else:
@@ -180,3 +187,9 @@ def check_filled(d):
                 print('Expecting at least one value for field: ' + f)
                 return False
     return True
+
+def get_user_input(s):
+    i = input(s)
+    if i and i == 'skip':
+        raise SkipEventError('Skip this event.')
+    return i
