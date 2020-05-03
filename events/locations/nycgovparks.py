@@ -8,7 +8,7 @@ from datetime import datetime, time, timedelta
 from dateutil.parser import parse
 
 from scripts import dyn_upload
-from events import utils
+from events import types
 
 url = 'https://www.nycgovparks.org'
 page = '/events/free'
@@ -59,13 +59,13 @@ def events(table=dyn_upload.DEV_EVENTS_TABLE):
                     if i:
                         info['photos'] = [url + i.get('href')]
 
-            utils.add_type(info, 'athletics', ['athletics', 'exercise', 'fitness', 'physique', 'aerobics'])
-            utils.add_type(info, 'crafts', ['craft', 'coloring', 'knitting', 'sculpt', 'creative writing'])
-            utils.add_type(info, 'teen', ['teen', 'tween', 'homework'])
-            utils.add_type(info, 'family', ['toddler', 'preschool', 'baby', 'child', 'family', 'pre-school', 'families', 'kids'])
-            utils.add_type(info, 'nature', ['audobon', 'bird wa', 'nature', 'hike'])
-            utils.add_type(info, 'science', ['geolog', 'biolog'])
-            utils.add_type(info, 'advocacy', ['volunteer'])
+            types.add_type(info, 'athletics', ['athletics', 'exercise', 'fitness', 'physique', 'aerobics'])
+            types.add_type(info, 'crafts', ['craft', 'coloring', 'knitting', 'sculpt', 'creative writing'])
+            types.add_type(info, 'teen', ['teen', 'tween', 'homework'])
+            types.add_type(info, 'family', ['toddler', 'preschool', 'baby', 'child', 'family', 'pre-school', 'families', 'kids'])
+            types.add_type(info, 'nature', ['audobon', 'bird wa', 'nature', 'hike'])
+            types.add_type(info, 'science', ['geolog', 'biolog'])
+            types.add_type(info, 'advocacy', ['volunteer'])
 
             cat_header = None
             for h3 in description_page.find_all('h3'):
@@ -75,7 +75,7 @@ def events(table=dyn_upload.DEV_EVENTS_TABLE):
                 categories_list = cat_header.next_sibling.text.split()
                 # "Best for kids"
                 exceptions = set(['art', 'games', 'education', 'senior'])
-                for t in utils.EVENT_TYPES:
+                for t in types.EVENT_TYPES:
                     if t not in exceptions:
                         for c in categories_list:
                             if t in c.lower():
