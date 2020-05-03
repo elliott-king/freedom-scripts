@@ -10,13 +10,6 @@ from titlecase import titlecase
 
 from scripts import dyn_upload
 
-API_URL = 'https://maps.googleapis.com/maps/api/place/'
-OUTPUT = 'json'
-# Maybe store elsewhere on disk
-API_KEY = 'AIzaSyCZ21RlCa8IVwxR-58b8fTgUXn_a4UYhbc'
-INPUTTYPE = 'textquery'
-mnh_bias = 'point:40.72986238308025,-74.02576541648762'
-
 multi_fields = ['types', 'dates', 'times']
 
 title_fields = [
@@ -33,38 +26,12 @@ single_fields = [
 def request_input(d):
     try:
         print('=' * 40)
-        missing = []
-        for f in (single_fields + title_fields):
-            if f not in d:
-                missing.append(f)
-                d[f] = None
-        for f in multi_fields:
-            if f not in d:
-                missing.append(f)
-                d[f] = []
-        print('Expected but did not find:', missing)
-        print('Text:')
-        print(d['description'])
         if d['website'] and len(d['website']) < 6:
+            # Throw out garbage
             del d['website']
-        if 'website' in d:
-            print(d['website'], '\n')
-
-        # Accept user input for singleton fields
-        for f in d:
-            if f not in multi_fields:
-                print(f.upper(), ':', ' ' * (20 - len(f)), d[f])
-                new = input('If applicable, new value:\n')
-                if new and new != 'yes' and new  != 'y' and new != 'Y' and new != 'Yes':
-                    d[f] = new
-                    if f.lower() == 'rsvp':
-                        d[f] = d[f] == 'True'
-                if f in title_fields:
-                    d[f] = titlecase(d[f])
-
-        # Eliminate dupes
-        # TODO: some nypl events have multiple times w/in one day
-        d['dates'] = list(set(d['dates']))
+        display_missing(d)
+        display_info(d)
+        singleton_fields(d)
 
         apply_dates(d)
         apply_times(d)
@@ -90,15 +57,51 @@ def request_input(d):
     except Exception as e:
         print(traceback.format_exc())
         print('Issue with information, NOT UPLOADING')
+
+def display_missing(d):
+    missing = []
+    for f in (single_fields + title_fields):
+        if f not in d:
+            missing.append(f)
+            d[f] = None
+    for f in multi_fields:
+        if f not in d:
+            missing.append(f)
+            d[f] = []
+    print('Expected but did not find:', missing)
+
+def display_info(d):
+    print('Text:')
+    print(d['description'])
+    if 'website' in d:
+        print(d['website'], '\n')
+
+def singleton_fields(d):
+    for f in d:
+        if f not in multi_fields:
+            print(f.upper(), ':', ' ' * (20 - len(f)), d[f])
+            new = input('If applicable, new value:\n')
+            if new and new != 'yes' and new  != 'y' and new != 'Y' and new != 'Yes':
+                d[f] = new
+                if f.lower() == 'rsvp':
+                    d[f] = d[f] == 'True'
+            if f in title_fields:
+                d[f] = titlecase(d[f])
     
 # It's good if the location_description is not the possessive form
 def search_one(name):
+    API_URL = 'https://maps.googleapis.com/maps/api/place/'
+    OUTPUT = 'json'
+    API_KEY = 'AIzaSyCZ21RlCa8IVwxR-58b8fTgUXn_a4UYhbc'
+    INPUTTYPE = 'textquery'
+    MNH_BIAS = 'point:40.72986238308025,-74.02576541648762'
+
     query = name
     target = 'findplacefromtext'
     fields = {'geometry/location', 'name', 'types', 'place_id'}
     url = os.path.join(API_URL, target, OUTPUT)
     payload = {
-                'locationbias': mnh_bias,
+                'locationbias': MNH_BIAS,
                 'input': query,
                 'inputtype': INPUTTYPE,
                 'fields': ','.join(fields),
@@ -131,6 +134,8 @@ def apply_times(d):
     
 
 def apply_dates(d):
+    # TODO: some nypl events have multiple times w/in one day
+    d['dates'] = list(set(d['dates']))
     print('dates:', d['dates'])
     dates = []
     while(True):
@@ -155,7 +160,6 @@ def apply_dates(d):
         d['dates'] = dates
 
 def apply_types(d):
-
     print('types:', d['types'])
     types = []
     while(True):
