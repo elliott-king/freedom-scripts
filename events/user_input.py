@@ -88,7 +88,8 @@ def display_missing(d):
 def check_canceled(d):
     for field in ['name', 'description']:
         if d[field]:
-            if 'canceled' or 'cancelled' in d[field].lower():
+            if 'canceled' in d[field].lower() or 'cancelled' in d[field].lower():
+                print("Event canceled:", d['name'])
                 return True
     return False
 
