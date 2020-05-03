@@ -31,16 +31,18 @@ class SkipEventError(Exception):
 
 # should create new dict
 def request_input(d):
+    print('=' * 40)
+    if d['website'] and len(d['website']) < 6:
+        # Throw out garbage
+        del d['website']
+    if check_canceled(d):
+        return
+    display_missing(d)
     if 'id' in d:
         del d['id']
     if IN_QUARANTINE:
         d['location_description'] = 'Manhattan'
     try:
-        print('=' * 40)
-        if d['website'] and len(d['website']) < 6:
-            # Throw out garbage
-            del d['website']
-        display_missing(d)
         display_info(d)
         singleton_fields(d)
 
@@ -82,6 +84,13 @@ def display_missing(d):
             missing.append(f)
             d[f] = []
     print('Expected but did not find:', missing)
+
+def check_canceled(d):
+    for field in ['name', 'description']:
+        if d[field]:
+            if 'canceled' or 'cancelled' in d[field].lower():
+                return True
+    return False
 
 def display_info(d):
     print('Text:')
