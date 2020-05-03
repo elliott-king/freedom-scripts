@@ -11,6 +11,7 @@ from collections import defaultdict
 
 from scripts import dyn_upload
 from events import utils
+from events import types
 
 url = 'https://www.nypl.org'
 page = '/events/calendar'
@@ -120,7 +121,8 @@ def events(table=dyn_upload.DEV_EVENTS_TABLE):
                             print('Could not access api for library:', eventpage.find('div', class_='event-location').a.text)
                 if not scrape_dates(info, eventpage):
                     continue
-                add_types(info)
+                types.add_types(info)
+                types.add_rsvp(info)
 
                 if not dyn_upload.is_uploaded(info, table) and not utils.in_prev_parsed_events(prev_events, info):
                     events.append(info)
@@ -128,77 +130,6 @@ def events(table=dyn_upload.DEV_EVENTS_TABLE):
                     utils.add_to_prev_events(prev_events, info)
 
     return events
-
-def add_types(info):
-    # TODO: Some types our users may not be initially interested in:
-    # family, teen, education, senior, crafts, games, technology
-
-    # TODO: if has type film, remove other types?
-
-    utils.add_type(info, 'family', ['toddler', 'preschool', 'baby', 'babies', 'child', 'family', 'pre-school', 'families', 'kids', 'toys', 'story time', 'storytime', 'pre-k', 'open play', ' stem ', 'youngster', 'kidz', 'parent', 'early literacy'])
-    utils.add_type(info, 'music', ['jazz', 'music', 'song', 'concert', 'opera', 'baroque', 'fugue', 'choral', 'quartet', 'karaoke'])
-    utils.add_type(info, 'film', ['film', 'movie', 'matinee', 'cinema', 'screening'])
-    utils.add_type(info, 'crafts', ['craft', 'coloring', 'knitting', 'sculpt', 'creative writing', 'sewing', 'materials', 'crochet', 'button', 'collage', 'felt ', 'perler', 'origami', 'supplies', 'beads', 'jewelry', 'create your own'])
-    utils.add_type(info, 'games', ['jigsaw', 'puzzle', 'boardgame', 'video games', 'card game', 'dungeons & dragons', 'gaming', 'ps4', 'nintendo switch', 'xbox', 'game', 'crossword', ' uno', 'lego ', 'legos', 'mah jong', 'mahjong', 'chess', 'wii', 'scrabble', 'bingo'])
-    utils.add_type(info, 'advocacy', ['awareness', 'council member', 'citizenship'])
-    utils.add_type(info, 'science', [' stem ', 'robot', ' steam '])
-    utils.add_type(info, 'technology', [])
-    utils.add_type(info, 'literature', ['literature', 'book discussion', 'book club', 'poem', 'poetry', 'reading and discussion', 'read and discuss'])
-    # Tech things are really all classes: eg, learn CSS
-    utils.add_type(info, 'education', ['learn how to', 'learn to', 'teach you', 'edit text', 'practice', 'research', 'job application', 'tutor', 'education', 'covers the basics', 'cover the basics', 'computer', 'css', 'html', 'technolog', 'blogging', 'edit text', 'tech issue', 'bilingual', 'photoshop', 'job seeker', 'resume build', 'application', 'microsoft', 'downloading', 'intro to', 'introduction to', 'your resume', 'job search', 'career', 'database', 'excel genius', 'census', 'classroom', 'writer\'s circle'])
-    utils.add_type(info, 'health_medical', ['hygiene', 'mental health', 'first aid', 'disease', 'healthcare', 'health care', 'medical', 'wellness'])
-    utils.add_type(info, 'senior', [' aging', 'seniors', 'aarp'])
-    utils.add_type(info, 'athletics', ['athletics', 'exercise', 'fitness', 'physique', 'aerobics', 'sports', 'yoga'])
-    utils.add_type(info, 'teen', ['teen', 'tween', 'homework', 'student', 'college', 'manga', 'anime', 'youth'])
-    utils.add_type(info, 'history', ['history', 'historic'])
-    utils.add_type(info, 'comedy', ['comed'])
-
-    # TODO: 'all ages'
-    def check_age_range(start, end):
-        start = int(start)
-        if start < 11:
-            if 'family' not in info['types']:
-                info['types'].append('family')
-        elif end:
-            end = int(end)
-            if end < 19:
-                if 'teen' not in info['types']:
-                    info['types'].append('teen')
-        else:
-            if 'teen' not in info['types']:
-                info['types'].append('teen')
-
-
-    # Attempt to parse an age range, if it exists
-    if 'family' not in info['types'] and 'teen' not in info['types'] and 'description' in info:
-        m = re.search(r'([0-9]+).+?([0-9]+)', info['description'])
-        if m:
-            check_age_range(m.group(1), m.group(2))
-        else:
-            m = re.search(r'ges ([0-9]+) and older', info['description'])
-            if m:
-                check_age_range(m.group(1), None)
-            else:
-                m = re.search(r'ges ([0-9]+) and up', info['description'])
-                if m:
-                    check_age_range(m.group(1), None)
-                else:
-                    m = re.search(r'ges ([0-9]+)[\s]?\+', info['description'])
-                    if m:
-                        check_age_range(m.group(1), None)
-                    else:
-                        m = re.search(r'ges ([0-9]+) &', info['description'])
-                        if m:
-                            check_age_range(m.group(1), None)
-
-
-    # rsvp?
-    info['rsvp'] = False
-    for s in ['rsvp', 'regist', 'sign-up', 'ticket', 'reserve']:
-        if s in info['name'].lower() or ('description' in info and s in info['description'].lower()):
-            info['rsvp'] = True
-    if 'description' in info and 'no registr' in info['description'].lower():
-        info['rsvp'] = False
 
 def scrape_dates(info, eventpage):
     deets = eventpage.find('div', class_='event-details')
