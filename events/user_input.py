@@ -24,6 +24,8 @@ single_fields = [
 
 # should create new dict
 def request_input(d):
+    if 'id' in d:
+        del d['id']
     try:
         print('=' * 40)
         if d['website'] and len(d['website']) < 6:
