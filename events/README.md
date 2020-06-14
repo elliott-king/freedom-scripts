@@ -9,10 +9,11 @@ for e in events:
 ## aggregators:
  - https://www.nonsensenyc.com/
  - https://bestnewyorkcomedy.com/
+ - https://theskint.com/
 
 ## ind. venues:
  - https://bluestockings.com/
- - hellskitchen.ucbtheatre.com/schedulex
+ - https://hellskitchen.ucbtheatre.com/schedulex
  - https://www.nycgovparks.org/events/
  - https://www.nypl.org/events/
  - https://www.bricartsmedia.org
@@ -22,6 +23,7 @@ for e in events:
  - http://www.drawingcenter.org
  - http://creeklic.com/calendar/
  - https://www.amny.com/things-to-do
+ - BRIC Arts/Media (Corona)
 
  ## Look at:
  - Pine Box Rock Shop
@@ -34,7 +36,23 @@ for e in events:
  - pioneer works
  - queens public library
  - brooklyn public library
- - the orbit
+ - nightly met opera streams (not free)
 
- ## Shoutout: 
- - u/thivnav for flushing town hall
+## No events for Corona:
+ - Carnegie Hall
+ - Lincoln Center
+ - Flushing Town Hall
+
+## Comedy Clubs: 
+- Caveat (pay what you will)
+- UCBT
+- The PIT 
+- The Magnet Theater
+- Bell House 
+- Littlefield
+
+## Theater
+- The Actor's Fund (actorsfund.org)
+
+## Art
+- The New Museum
