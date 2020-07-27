@@ -23,6 +23,7 @@ single_fields = [
 ]
 
 IN_QUARANTINE = True
+SKIP_FAMILY_EVENTS = True
 
 class SkipEventError(Exception):
     """Signify that user would like to skip this event."""
@@ -31,11 +32,11 @@ class SkipEventError(Exception):
 
 e = None # TODO: hacky, but useful to access this if we ctrl-c
 def request_multiple(events):
+    # TODO: first go through and merge events w/ same name but different dates
     events = events[::-1]
     while len(events) > 0:
         global e 
         e = events.pop()
-        # TODO: skip event if not reddit-approved
         request_input(e)
 
 # should create new dict
@@ -49,8 +50,12 @@ def request_input(d):
     display_missing(d)
     if 'id' in d:
         del d['id']
+    if SKIP_FAMILY_EVENTS:
+        if not reddit_oriented(d):
+            return
     if IN_QUARANTINE:
-        d['location_description'] = 'Manhattan'
+        if not d['location_description']:
+            d['location_description'] = 'Manhattan'
     try:
         display_info(d)
         singleton_fields(d)
@@ -216,3 +221,12 @@ def get_user_input(s):
     if i and i == 'skip':
         raise SkipEventError('Skip this event.')
     return i
+
+# In the interest of making my work simpler, and making this more presentable where I am putting up
+# the events (namely reddit), we can identify the family-oriented events and set them aside.
+def reddit_oriented(event):
+    for t in ['family', 'teen', 'senior', 'crafts', 'games', 'technology']: # education
+        if t in event['types']:
+            print("Event is family event, has type:", t)
+            return False
+    return True

@@ -45,7 +45,7 @@ def add_type(event, typename, strings, extra_search=[]):
 def add_rsvp(event):
   # rsvp?
   event['rsvp'] = False
-  for s in ['rsvp', 'regist', 'sign-up', 'ticket', 'reserve']:
+  for s in ['rsvp', 'regist', 'sign-up', 'ticket', 'reserve', 'appointment`']:
       if s in event['name'].lower() or ('description' in event and s in event['description'].lower()):
           event['rsvp'] = True
   if 'description' in event and 'no registr' in event['description'].lower():
