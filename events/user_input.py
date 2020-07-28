@@ -31,13 +31,10 @@ class SkipEventError(Exception):
     def __init__(self, message):
         self.message = message
 
-e = None # TODO: hacky, but useful to access this if we ctrl-c
 def request_multiple(events):
     events = squash_events(events)
-    events = events[::-1] # order from oldest to newest, so pop() will give us newest
-    while len(events) > 0:
-        global e 
-        e = events.pop()
+    for i, e in enumerate(events):
+        print('on item', i, 'of', len(events))
         request_input(e)
 
 # should create new dict
