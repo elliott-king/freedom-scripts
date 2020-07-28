@@ -7,6 +7,7 @@ import traceback
 from dateutil.parser import parse
 from datetime import datetime, timedelta
 from titlecase import titlecase
+from collections import defaultdict
 
 from scripts import dyn_upload
 
@@ -32,8 +33,8 @@ class SkipEventError(Exception):
 
 e = None # TODO: hacky, but useful to access this if we ctrl-c
 def request_multiple(events):
-    # TODO: first go through and merge events w/ same name but different dates
-    events = events[::-1]
+    events = squash_events(events)
+    events = events[::-1] # order from oldest to newest, so pop() will give us newest
     while len(events) > 0:
         global e 
         e = events.pop()
@@ -230,3 +231,22 @@ def reddit_oriented(event):
             print("Event is family event, has type:", t)
             return False
     return True
+
+# events that have the same name should be merged, with their dates & times added together
+# after quarantine, may be good to enforce that events also have the same location_description
+def squash_events(events):
+    ret = []
+    events_by_name = defaultdict(list)
+    for e in events:
+        events_by_name[e['name']].append(e)
+    
+    for _event_name, list_by_name in events_by_name.items():
+        if len(list_by_name) == 1:
+            ret.append(list_by_name[0])
+            continue
+        combined_event = list_by_name[0]
+        for shared_event in list_by_name[1:]:
+            combined_event['dates'] = list(set(combined_event['dates'] + shared_event['dates']))
+            combined_event['times'] += shared_event['times']
+        ret.append(combined_event)
+    return ret
