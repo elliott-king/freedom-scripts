@@ -82,7 +82,7 @@ def types(name='', description=''):
             ret.append(t)
     
     family_type = check_family_events(description)
-    if family_type && family_type not in ret:
+    if family_type and family_type not in ret:
         ret.append(family_type)
     return ret
 
