@@ -38,7 +38,7 @@ def rsvp(description):
     if 'no registr' in description.lower():
         return False
     for s in ['rsvp', 'regist', 'sign-up', 'ticket', 'reserve', 'appointment']:
-        if s in description:
+        if s in description.lower():
             return True
     return False
 
