@@ -243,7 +243,7 @@ def squash_events(events):
             continue
         combined_event = list_by_name[0]
         for shared_event in list_by_name[1:]:
-            combined_event['dates'] = list(set(combined_event['dates'] + shared_event['dates']))
+            combined_event['dates'] = sorted(list(set(combined_event['dates'] + shared_event['dates'])))
             combined_event['times'] += shared_event['times']
         ret.append(combined_event)
     return ret
