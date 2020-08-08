@@ -11,7 +11,7 @@ from collections import defaultdict
 
 from scripts import dyn_upload
 
-multi_fields = ['types', 'dates', 'times']
+multi_fields = ['dates', 'times']
 
 title_fields = [
     'name', 'host', 'location_description'
@@ -24,7 +24,6 @@ single_fields = [
 ]
 
 IN_QUARANTINE = True
-SKIP_FAMILY_EVENTS = True
 
 class SkipEventError(Exception):
     """Signify that user would like to skip this event."""
@@ -32,7 +31,10 @@ class SkipEventError(Exception):
         self.message = message
 
 def request_multiple(events):
-    events = squash_events(events)
+    # This makes sense for data input convenience. 
+    # However, it makes the display of events very weird.
+    # For now, we will do without
+    # events = squash_events(events) 
     for i, e in enumerate(events):
         print('on item', i, 'of', len(events))
         request_input(e)
@@ -40,7 +42,7 @@ def request_multiple(events):
 # should create new dict
 def request_input(d):
     print('=' * 40)
-    if d['website'] and len(d['website']) < 6:
+    if 'website' in d and len(d['website']) < 6:
         # Throw out garbage
         del d['website']
     if check_canceled(d):
@@ -48,9 +50,6 @@ def request_input(d):
     display_missing(d)
     if 'id' in d:
         del d['id']
-    if SKIP_FAMILY_EVENTS:
-        if not reddit_oriented(d):
-            return
     if IN_QUARANTINE:
         if not d['location_description']:
             d['location_description'] = 'Manhattan'
@@ -60,7 +59,6 @@ def request_input(d):
 
         apply_dates(d)
         apply_times(d)
-        apply_types(d)
 
         if 'location' not in d:
             d['location'] = search_one(d['location_description'])
@@ -99,7 +97,7 @@ def display_missing(d):
 
 def check_canceled(d):
     for field in ['name', 'description']:
-        if d[field]:
+        if field in d and d[field]:
             if 'canceled' in d[field].lower() or 'cancelled' in d[field].lower():
                 print("Event canceled:", d['name'])
                 return True
@@ -194,6 +192,7 @@ def apply_dates(d):
     if dates:
         d['dates'] = dates
 
+# legacy & unused
 def apply_types(d):
     print('types:', d['types'])
     types = []
