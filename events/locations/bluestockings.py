@@ -7,7 +7,6 @@ from bs4 import BeautifulSoup
 from dateutil.parser import parse
 
 from scripts import dyn_upload
-from events import types
 
 url = 'https://bluestockings.com/calendar'
 
@@ -40,7 +39,6 @@ def events(table=dyn_upload.DEV_EVENTS_TABLE):
             d, t = re.search("(.*) @ (.*) –", e_soup.find("div", class_="dt-duration").text).groups()
             info['dates'] = [str(parse(d).date())]
             info['times'] = [str(parse(t).time())]
-            info['types'] = types.types(info['description'])
 
             if not dyn_upload.is_uploaded(info, table):
                 events.append(info)

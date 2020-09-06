@@ -8,6 +8,7 @@ from events import utils
 from events import types
 
 # There are a few events endpoints. event-programs includes locations, the others don't
+# For reference, visit https://refinery.nypl.org/api/nypl with NO EXTRA SLASHES
 url = 'https://refinery.nypl.org/api/nypl/'
 api_endpoint = 'ndo/v0.1/content/nodes/event-programs'
 page = '?page[number]='
@@ -42,11 +43,10 @@ def parse_single_event_json(event_json):
   event = {
     'source': nypl_url,
     'dates': [start_date.date().isoformat()],
-    'types': ['library'],
     'times': [start_date.time().isoformat(), end_date.time().isoformat()],
     'name': event_json['attributes']['name']['en']['text'],
     'website': event_json['attributes']['uri']['full-uri'],
-    'description': event_json['attributes']['description']['en']['short-text']
+    'description': event_json['attributes']['description']['en']['short-text'],
   }
 
   library_url = event_json['relationships']['location']['links']['self']
@@ -56,7 +56,6 @@ def parse_single_event_json(event_json):
   event['location_description'] = library['location_description']
 
   full_description = event_json['attributes']['description']['en']['full-text']
-  event['types'] += types.types(name=event['name'], description=full_description)
 
   event['rsvp'] = (
     not not event_json['attributes']['registration-type']

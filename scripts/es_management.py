@@ -29,7 +29,6 @@ def setup_index(client, index): # TODO: change type of 'times'
         body["properties"]["host"] = { "type": "keyword"}
         body["properties"]["source"] = { "type": "keyword"}
         body["properties"]["rsvp"] = { "type": "boolean"}
-        body["properties"]["types"] = { "type": "keyword"}
 
     if index == ART_INDEX:
         body["properties"]["date_added"] = { "type": "date"}

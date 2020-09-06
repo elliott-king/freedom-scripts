@@ -56,7 +56,6 @@ def events(table=dyn_upload.DEV_EVENTS_TABLE):
             'host': 'Carnegie Hall',
             'source': 'Carnegie Hall Citywide',
             'location_description': hit['facility'],
-            'types': ['music'],
             'rsvp': True # TODO: currently assuming the worst
         }
 

@@ -26,7 +26,6 @@ def events(table=dyn_upload.DEV_EVENTS_TABLE):
             'name': entry['title'],
             'description': entry['description'],
             'website': base + '/event/' + entry['eventID'],
-            'types': ['music'],
             'host': 'Flushing Town Hall',
             'rsvp': False,
             'source': base,

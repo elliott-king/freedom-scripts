@@ -22,7 +22,6 @@ def events(table=dyn_upload.DEV_EVENTS_TABLE):
           'host': 'Brooklyn Public Library', # TODO: fix when quarantine ends
           'location_description': 'Brooklyn', # TODO: same
           'dates': [],
-          'types': ['library'],
           'times': [],
           'photos': [],
       }
@@ -53,7 +52,6 @@ def events(table=dyn_upload.DEV_EVENTS_TABLE):
       description_divs = eventpage.find_all('div', class_='pane-entity-field')
       long_description = ' '.join(list(map(extract_text, description_divs)))
       event['rsvp'] = types.rsvp(long_description)
-      event['types'] += types.types(name=event['name'], description=event['description'])
 
       events.append(event)
   return events
