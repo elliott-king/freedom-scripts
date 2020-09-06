@@ -30,11 +30,21 @@ class SkipEventError(Exception):
     def __init__(self, message):
         self.message = message
 
+def upload_multiple_no_overview(events):
+    for i, e in enumerate(events):
+        print('on item', i, 'of', len(events))
+        if not check_filled(e):
+            raise SkipEventError('Event not filled:' + str(e))
+        if check_canceled(e):
+            raise SkipEventError('Event is cancelled:' + str(e))
+        if 'website' in e and 'http' not in e['website']:
+            e['website'] = 'http://' + e['website']
+        if 'location' not in e:
+            e['location'] = search_one(e['location_description'])
+    dyn_upload.add_items_to_table(dyn_upload.DEV_EVENTS_TABLE, dyn_upload.DEV_PHOTOS_TABLE, events)
+
 def request_multiple(events):
-    # This makes sense for data input convenience. 
-    # However, it makes the display of events very weird.
-    # For now, we will do without
-    # events = squash_events(events) 
+    # TODO: re-request the database events to check against for dupes
     for i, e in enumerate(events):
         print('on item', i, 'of', len(events))
         request_input(e)
@@ -206,11 +216,22 @@ def apply_types(d):
         d['types'] = types
 
 def check_filled(d):
-    for f in multi_fields + title_fields + single_fields:
-        if f not in['rsvp', 'times', 'source', 'website']:
+    error_str = 'Expecting value for field:'
+    for f in multi_fields:
+        if f not in d or not isinstance(d[f], list):
+            print(error_str, f)
+            return False
+    for f in title_fields:
+        if f not in d or not d[f]:
+            print(error_str, f)
+    for f in single_fields:
+        if f not in ['description', 'rsvp']:
             if f not in d or not d[f]:
-                print('Expecting at least one value for field: ' + f)
+                print(error_str, f)
                 return False
+        elif f not in d:
+            print(error_str, f)
+            return False
     return True
 
 def get_user_input(s):
