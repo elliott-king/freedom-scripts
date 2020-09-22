@@ -33,8 +33,8 @@ def events(table=dyn_upload.DEV_EVENTS_TABLE):
       event['photos'].append(url + ediv.find('img')['src'])
 
       if 'virtual' not in meta.text.lower():
-        print('Has a location not of the interweb!')
-        print(event['name'], event['website'])
+        # print('Has a location not of the interweb!')
+        # print(event['name'], event['website'])
         continue
 
       eventpage = BeautifulSoup(requests.get(event['website']).text, 'html.parser')

@@ -34,14 +34,33 @@ def upload_multiple_no_overview(events):
     for i, e in enumerate(events):
         print('on item', i, 'of', len(events))
         if not check_filled(e):
-            raise SkipEventError('Event not filled:' + str(e))
+            raise SkipEventError('Event ' + str(i) + ' not filled:' + str(e))
         if check_canceled(e):
-            raise SkipEventError('Event is cancelled:' + str(e))
+            raise SkipEventError('Event ' + str(i) + ' is cancelled:' + str(e))
         if 'website' in e and 'http' not in e['website']:
             e['website'] = 'http://' + e['website']
         if 'location' not in e:
             e['location'] = search_one(e['location_description'])
     dyn_upload.add_items_to_table(dyn_upload.DEV_EVENTS_TABLE, dyn_upload.DEV_PHOTOS_TABLE, events)
+
+def upload_multiple_with_skips(events):
+    finalized_events = []
+    for i, e in enumerate(events):
+        print('checking item', i, 'of', len(events))
+        if not check_filled(e):
+            print()
+            print('Event ' + str(i) + ' not filled:' + str(e))
+            continue
+        if check_canceled(e):
+            print()
+            print('Event ' + str(i) + ' is cancelled:' + str(e))
+            continue
+        if 'website' in e and 'http' not in e['website']:
+            e['website'] = 'http://' + e['website']
+        if 'location' not in e:
+            e['location'] = search_one(e['location_description'])
+        finalized_events.append(e)
+    dyn_upload.add_items_to_table(dyn_upload.DEV_EVENTS_TABLE, dyn_upload.DEV_PHOTOS_TABLE, finalized_events)
 
 def request_multiple(events):
     # TODO: re-request the database events to check against for dupes

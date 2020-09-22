@@ -78,15 +78,17 @@ def delete_item(item, table_name):
 
 PAIRS = {}
 # TODO: should correspond to list for each event
-PAIRS[DEV_EVENTS_TABLE] = defaultdict(list)
-for e in get_all_items_from_table(DEV_EVENTS_TABLE):
-    name = e['name'].lower().strip()
-    PAIRS[DEV_EVENTS_TABLE][name].append({'dates': set(e['dates']), 'host': e.get('host', None)})
+def load_duplicates():
+    PAIRS[DEV_EVENTS_TABLE] = defaultdict(list)
+    for e in get_all_items_from_table(DEV_EVENTS_TABLE):
+        name = e['name'].lower().strip()
+        PAIRS[DEV_EVENTS_TABLE][name].append({'dates': set(e['dates']), 'host': e.get('host', None)})
 
-PAIRS[DEV_ART_TABLE] = defaultdict(str)
-for e in get_all_items_from_table(DEV_ART_TABLE):
-    name = e['name'].lower().strip()
-    PAIRS[DEV_ART_TABLE][name] = e['type']
+    PAIRS[DEV_ART_TABLE] = defaultdict(str)
+    for e in get_all_items_from_table(DEV_ART_TABLE):
+        name = e['name'].lower().strip()
+        PAIRS[DEV_ART_TABLE][name] = e['type']
+load_duplicates()
 
 # TODO: handle public arts as well
 def is_uploaded(location, table=DEV_EVENTS_TABLE):
@@ -106,13 +108,14 @@ def is_uploaded(location, table=DEV_EVENTS_TABLE):
                 return True
     return False
 
+# todo: add to 'createdAt' field
 def add_items_to_table(table_name, photo_table_name, items):
     dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
 
     table = dynamodb.Table(table_name)
     photos_table = dynamodb.Table(photo_table_name)
 
-    for i in items:
+    for index, i in enumerate(items):
         if is_uploaded(i, table_name):
             print('Cannot add: "' + i['name'] + '" already exists in dynamodb')
             continue
@@ -126,7 +129,7 @@ def add_items_to_table(table_name, photo_table_name, items):
         # DynamoDB does not take float values.
         i = json.loads(i, parse_float=decimal.Decimal)
 
-        print('Adding location', i['name'])
+        print('Adding location', index, '- ', i['name'])
         response = table.put_item(Item=i)
         print('Location HTTP code', response['ResponseMetadata']['HTTPStatusCode'])
         if photo:
