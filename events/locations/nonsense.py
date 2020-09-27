@@ -7,11 +7,13 @@ from dateutil.parser import parse
 weekdays = ['MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY','SUNDAY']
 
 def contents(filename):
-    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../nonsense', filename)
+    path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'nonsense', filename))
     with open(path, 'r') as f:
         return f.read()
 
-
+# attempts to parse upcoming events
+# cannot currently be automated
+# TODO: currently oriented for quarantine
 def events(filename):
     s = contents(filename)
     header = r'[X\*]{5}(.*?)[X\*]{5}'
@@ -29,7 +31,8 @@ def events(filename):
                 'name': splits[3],
                 'source': 'http://www.nonsensenyc.com/',
                 'website': splits[-1],
-                'location_description': splits[-3],
+                # 'location_description': splits[-3],
+                'location_description': "New York City", # TODO: quarantine
                 'description': '\n'.join(splits[5:]),
                 'rsvp': 'rsvp' in text.lower() or 'registration' in text.lower()
             }
