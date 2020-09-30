@@ -1,0 +1,3 @@
+# https://www.linuxtechi.com/schedule-automate-tasks-linux-cron-jobs/
+
+0 7 * * 1 python3 /home/ec2-user/data/scrape_events.py
