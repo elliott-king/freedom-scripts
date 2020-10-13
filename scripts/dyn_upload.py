@@ -3,6 +3,8 @@ import json
 import decimal
 import uuid
 
+from datetime import datetime, timezone
+
 from boto3.dynamodb.conditions import Key, Attr
 from botocore.exceptions import ClientError
 from collections import defaultdict
@@ -124,6 +126,11 @@ def add_items_to_table(table_name, photo_table_name, items):
             i['id'] = str(uuid.uuid4())
         photo = legacy_support.update_legacy_photo(i)
         photos = i.pop('photos', None)
+
+        # Add timestamps just before uploading: this is the single source of truth for these
+        utc_date_str = datetime.now(timezone.utc).isoformat().replace('+00:00', 'z')
+        i['createdAt'] = utc_date_str
+        i['updatedAt'] = utc_date_str
 
         i = json.dumps(i, cls=DecimalEncoder)
         # DynamoDB does not take float values.
