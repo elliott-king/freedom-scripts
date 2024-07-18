@@ -13,24 +13,28 @@ from freedom.scripts import dyn_upload
 from freedom.events.models import Event
 from freedom.events.utils import write_to_debug_file
 
-multi_fields = ['dates', 'times']
+multi_fields = ["dates", "times"]
 
-title_fields = [
-    'name', 'host', 'location_description'
-]
+title_fields = ["name", "host", "location_description"]
 
 single_fields = [
-    'website', 'description', 'rsvp', 'source'
+    "website",
+    "description",
+    "rsvp",
+    "source",
     # Omit 'location', need Google for that.
     # omit photos?
 ]
 
 IN_QUARANTINE = False
 
+
 class SkipEventError(Exception):
     """Signify that user would like to skip this event."""
+
     def __init__(self, message):
         self.message = message
+
 
 # def upload_multiple_no_overview(events):
 #     for i, e in enumerate(events):
@@ -46,10 +50,11 @@ class SkipEventError(Exception):
 
 #     dyn_upload.add_items_to_table(dyn_upload.DEV_EVENTS_TABLE, dyn_upload.DEV_PHOTOS_TABLE, events)
 
+
 def upload_multiple_with_skips(events: list[Event]):
     finalized_events = []
     for i, e in enumerate(events):
-        print('checking item', i, 'of', len(events))
+        print("checking item", i, "of", len(events))
 
         try:
             e.valid()
@@ -67,9 +72,9 @@ def upload_multiple_with_skips(events: list[Event]):
         finalized_events.append(e)
 
     write_to_debug_file(events)
-    dyn_upload.add_items_to_table(dyn_upload.DEV_EVENTS_TABLE, dyn_upload.DEV_PHOTOS_TABLE, finalized_events)
-
-
+    dyn_upload.add_items_to_table(
+        dyn_upload.DEV_EVENTS_TABLE, dyn_upload.DEV_PHOTOS_TABLE, finalized_events
+    )
 
     #     if not check_filled(e):
     #         print()
@@ -86,6 +91,7 @@ def upload_multiple_with_skips(events: list[Event]):
     #     finalized_events.append(e)
     # write_to_debug_file(events)
     # dyn_upload.add_items_to_table(dyn_upload.DEV_EVENTS_TABLE, dyn_upload.DEV_PHOTOS_TABLE, finalized_events)
+
 
 # def request_multiple(events):
 #     # TODO: re-request the database events to check against for dupes
@@ -130,16 +136,17 @@ def upload_multiple_with_skips(events: list[Event]):
 #         else:
 #             # TODO: should choose table
 #             dyn_upload.add_items_to_table(dyn_upload.DEV_EVENTS_TABLE, dyn_upload.DEV_PHOTOS_TABLE, [d])
-    
+
 #     except SkipEventError:
 #         print('Skipping this event')
 #     except Exception:
 #         print(traceback.format_exc())
 #         print('Issue with information, NOT UPLOADING')
 
+
 def display_missing(d):
     missing = []
-    for f in (single_fields + title_fields):
+    for f in single_fields + title_fields:
         if f not in d:
             missing.append(f)
             d[f] = None
@@ -147,7 +154,8 @@ def display_missing(d):
         if f not in d:
             missing.append(f)
             d[f] = []
-    print('Expected but did not find:', missing)
+    print("Expected but did not find:", missing)
+
 
 # def check_canceled(d):
 #     for field in ['name', 'description']:
@@ -157,86 +165,93 @@ def display_missing(d):
 #                 return True
 #     return False
 
+
 def display_info(d):
-    print('Text:')
-    print(d['description'])
-    if 'website' in d:
-        print(d['website'], '\n')
+    print("Text:")
+    print(d["description"])
+    if "website" in d:
+        print(d["website"], "\n")
+
 
 def singleton_fields(d):
     for f in d:
         if f not in multi_fields:
-            print(f.upper(), ':', ' ' * (20 - len(f)), d[f])
-            new = get_user_input('If applicable, new value:\n')
-            if new and new != 'yes' and new  != 'y' and new != 'Y' and new != 'Yes':
+            print(f.upper(), ":", " " * (20 - len(f)), d[f])
+            new = get_user_input("If applicable, new value:\n")
+            if new and new != "yes" and new != "y" and new != "Y" and new != "Yes":
                 d[f] = new
-                if f.lower() == 'rsvp':
-                    d[f] = d[f] == 'True'
+                if f.lower() == "rsvp":
+                    d[f] = d[f] == "True"
             if f in title_fields:
                 d[f] = titlecase(d[f])
 
     try:
-        j = r.json()['candidates'][0] # first result probably correct
+        j = r.json()["candidates"][0]  # first result probably correct
     except IndexError:
-        raise TypeError('No location found: ', name)
-    
+        raise TypeError("No location found: ", name)
+
     location = {
-        'lat': j['geometry']['location']['lat'],
-        'lon': j['geometry']['location']['lng']
+        "lat": j["geometry"]["location"]["lat"],
+        "lon": j["geometry"]["location"]["lng"],
     }
     return location
 
+
 def apply_times(d):
-    print('times:', d['times'])
+    print("times:", d["times"])
     times = []
-    while(True):
-        new = get_user_input('Enter a time, or refuse: ')
-        if new and new != 'yes' and new != 'y' and new != 'Y' and new != 'Yes':
+    while True:
+        new = get_user_input("Enter a time, or refuse: ")
+        if new and new != "yes" and new != "y" and new != "Y" and new != "Yes":
             times.append(str(parse(new).time()))
         else:
             break
     if times:
-        d['times'] = times
-    
+        d["times"] = times
+
 
 def apply_dates(d):
     # TODO: some nypl events have multiple times w/in one day
-    d['dates'] = list(set(d['dates']))
-    print('dates:', d['dates'])
+    d["dates"] = list(set(d["dates"]))
+    print("dates:", d["dates"])
     dates = []
-    while(True):
-        new = get_user_input('Enter a date, or refuse: ')
-        if new and new != 'yes' and new != 'y' and new != 'Y' and new != 'Yes':
+    while True:
+        new = get_user_input("Enter a date, or refuse: ")
+        if new and new != "yes" and new != "y" and new != "Y" and new != "Yes":
 
             # date range should be user-formatted start,end
-            if ',' in new:
-                [s,e] = new.split(',')
-                print(s,e)
+            if "," in new:
+                [s, e] = new.split(",")
+                print(s, e)
                 s = parse(s).date()
                 e = parse(e).date()
-                print(s,e)
+                print(s, e)
                 arr = [str(s + timedelta(days=x)) for x in range(0, (e - s).days + 1)]
                 print(arr)
                 dates += arr
             else:
-                dates.append(str(parse(new).date())) # user should write in year, if it is next year
+                dates.append(
+                    str(parse(new).date())
+                )  # user should write in year, if it is next year
         else:
             break
     if dates:
-        d['dates'] = dates
+        d["dates"] = dates
+
 
 # legacy & unused
 def apply_types(d):
-    print('types:', d['types'])
+    print("types:", d["types"])
     types = []
-    while(True):
-        new = get_user_input('Enter a type, or refuse: ')
-        if new and new != 'yes' and new != 'y' and new != 'Y' and new != 'Yes':
+    while True:
+        new = get_user_input("Enter a type, or refuse: ")
+        if new and new != "yes" and new != "y" and new != "Y" and new != "Yes":
             types.append(new)
         else:
             break
     if types:
-        d['types'] = types
+        d["types"] = types
+
 
 # def check_filled(d):
 #     error_str = 'Expecting value for field:'
@@ -257,20 +272,23 @@ def apply_types(d):
 #             return False
 #     return True
 
+
 def get_user_input(s):
     i = input(s)
-    if i and i == 'skip':
-        raise SkipEventError('Skip this event.')
+    if i and i == "skip":
+        raise SkipEventError("Skip this event.")
     return i
+
 
 # In the interest of making my work simpler, and making this more presentable where I am putting up
 # the events (namely reddit), we can identify the family-oriented events and set them aside.
 def reddit_oriented(event):
-    for t in ['family', 'teen', 'senior', 'crafts', 'games', 'technology']: # education
-        if t in event['types']:
+    for t in ["family", "teen", "senior", "crafts", "games", "technology"]:  # education
+        if t in event["types"]:
             print("Event is family event, has type:", t)
             return False
     return True
+
 
 # events that have the same name should be merged, with their dates & times added together
 # after quarantine, may be good to enforce that events also have the same location_description
@@ -278,7 +296,7 @@ def squash_events(events):
     ret = []
     events_by_name = defaultdict(list)
     for e in events:
-        events_by_name[e['name']].append(e)
+        events_by_name[e["name"]].append(e)
 
     for _event_name, list_by_name in events_by_name.items():
         if len(list_by_name) == 1:
@@ -286,7 +304,9 @@ def squash_events(events):
             continue
         combined_event = list_by_name[0]
         for shared_event in list_by_name[1:]:
-            combined_event['dates'] = sorted(list(set(combined_event['dates'] + shared_event['dates'])))
-            combined_event['times'] += shared_event['times']
+            combined_event["dates"] = sorted(
+                list(set(combined_event["dates"] + shared_event["dates"]))
+            )
+            combined_event["times"] += shared_event["times"]
         ret.append(combined_event)
     return ret

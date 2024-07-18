@@ -10,6 +10,7 @@ from freedom.openai_api import categorize_text
 from freedom.google_api import places_api_search_one
 from freedom.utils import Location
 
+
 # Helper class to convert a DynamoDB item to JSON.
 class DecimalEncoder(json.JSONEncoder):
     def default(self, o):
@@ -19,6 +20,7 @@ class DecimalEncoder(json.JSONEncoder):
             else:
                 return int(o)
         return super(DecimalEncoder, self).default(o)
+
 
 class BaseModel:
     name: str
@@ -32,6 +34,7 @@ class BaseModel:
 
     def infer_types(self) -> None:
         raise NotImplementedError
+
 
 @dataclass
 class Event(BaseModel):
@@ -51,8 +54,15 @@ class Event(BaseModel):
 
     finalized = False
 
-    required_scalar = [ "name", "website", "source", "host", "location_description", "description",]
-    required_vector = ['datetimes']
+    required_scalar = [
+        "name",
+        "website",
+        "source",
+        "host",
+        "location_description",
+        "description",
+    ]
+    required_vector = ["datetimes"]
 
     def __repr__(self) -> str:
         return f"Event<{self.name}:{self.location_description}>"
@@ -68,9 +78,9 @@ class Event(BaseModel):
         return [d.time().isoformat() for d in self.datetimes]
 
     def cancelled(self) -> bool:
-        for field in ['name', 'description']:
+        for field in ["name", "description"]:
             fv = getattr(self, field).lower()
-            if 'cancelled' in fv or 'postponed' in fv or "canceled" in fv:
+            if "cancelled" in fv or "postponed" in fv or "canceled" in fv:
                 return True
         return False
 
@@ -108,9 +118,16 @@ class Event(BaseModel):
         if name in compare:
             d = set(self.dates)
             for other in compare[name]:
-                if not d.isdisjoint(other['dates']) and other['host'] == self.host:
+                if not d.isdisjoint(other["dates"]) and other["host"] == self.host:
                     # fixme: set as a DEBUG log
-                    print('Already added', self.source, 'event:', self.name, 'with date', self.datetimes)
+                    print(
+                        "Already added",
+                        self.source,
+                        "event:",
+                        self.name,
+                        "with date",
+                        self.datetimes,
+                    )
                     return True
         return False
 
@@ -119,8 +136,8 @@ class Event(BaseModel):
 
         self.validate()
 
-        if self.website and 'http' not in self.website:
-            self.website = 'http://' + self.website
+        if self.website and "http" not in self.website:
+            self.website = "http://" + self.website
 
         if not self.id:
             self.id = str(uuid.uuid4())
@@ -140,30 +157,27 @@ class Event(BaseModel):
 
     def to_dict(self) -> dict:
         if not self.finalized:
-            raise ValueError('{self} not finalized')
+            raise ValueError("{self} not finalized")
 
         self.validate()
 
-        curr_date_str = datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z')
+        curr_date_str = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
-        print('curr_date_str', curr_date_str)
+        print("curr_date_str", curr_date_str)
         d = {
-            'source': self.source,
-            'host': self.host,
-            'locationDescription': self.location_description,
-            'rsvp': self.rsvp,
-            'photos': self.photos,
-            'name': self.name,
-            'website': self.website,
-
-            'dates': self.dates,
-            'times': self.times,
-
-            'createdAt': curr_date_str,
-            'updatedAt': curr_date_str,
-
-            'id': self.id,
-            '__typename': 'Event',
+            "source": self.source,
+            "host": self.host,
+            "locationDescription": self.location_description,
+            "rsvp": self.rsvp,
+            "photos": self.photos,
+            "name": self.name,
+            "website": self.website,
+            "dates": self.dates,
+            "times": self.times,
+            "createdAt": curr_date_str,
+            "updatedAt": curr_date_str,
+            "id": self.id,
+            "__typename": "Event",
         }
 
         # DynamoDB does not take float values.

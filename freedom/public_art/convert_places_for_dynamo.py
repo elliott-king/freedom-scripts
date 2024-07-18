@@ -20,22 +20,23 @@ Useful objects that ES may or may not need, but our DynamoDB table will:
 """
 
 import time
-import requests 
+import requests
 import uuid
 
 from public_art import photo_handler
 
 # TODO: can't yet handle array of types
 # _TYPES = ['sculpture', 'public']
-_TYPE = 'sculpture'
+_TYPE = "sculpture"
 _PHOTO_MAXHEIGHT = 400
 
+
 def get_photo(photo):
-    url = 'https://maps.googleapis.com/maps/api/place/photo'
+    url = "https://maps.googleapis.com/maps/api/place/photo"
     payload = {
-            'key': 'AIzaSyCZ21RlCa8IVwxR-58b8fTgUXn_a4UYhbc',
-            'maxheight': _PHOTO_MAXHEIGHT,
-            'photoreference': photo['photo_reference']
+        "key": "AIzaSyCZ21RlCa8IVwxR-58b8fTgUXn_a4UYhbc",
+        "maxheight": _PHOTO_MAXHEIGHT,
+        "photoreference": photo["photo_reference"],
     }
     r = requests.get(url, params=payload)
     return r
@@ -43,23 +44,23 @@ def get_photo(photo):
 
 def convert_place_object(place, place_type=_TYPE):
     location = {
-        'name': place['name'],
-        'location': {
-            'lat': place['geometry']['location']['lat'],
-            'lon': place['geometry']['location']['lng']
-            },
-        'date_added': time.time(),
+        "name": place["name"],
+        "location": {
+            "lat": place["geometry"]["location"]["lat"],
+            "lon": place["geometry"]["location"]["lng"],
+        },
+        "date_added": time.time(),
         # TODO: support list of types (see above)
-        'type': place_type,
-        'id': str(uuid.uuid4()),
-        'permanent': True,
-        'photos': []
+        "type": place_type,
+        "id": str(uuid.uuid4()),
+        "permanent": True,
+        "photos": [],
     }
 
-    if 'photos' in place:
-        for photo in place['photos']:
+    if "photos" in place:
+        for photo in place["photos"]:
             google_url = get_photo(photo).url
             s3_url = photo_handler.get_photo(google_url)
-            location['photos'].append(s3_url)
-    print("Converted place:", place['name'])
+            location["photos"].append(s3_url)
+    print("Converted place:", place["name"])
     return location

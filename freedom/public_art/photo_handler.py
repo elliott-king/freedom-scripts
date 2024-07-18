@@ -7,32 +7,30 @@ import time
 import magic
 
 name_to_extension = {
-        'image/jpeg': '.jpg',
-        'image/png': '.png',
-        }
+    "image/jpeg": ".jpg",
+    "image/png": ".png",
+}
 
-client = boto3.client('s3')
-events_bucket = 'freedom-js-appb7dc6789c3d248c18c4e34a5eb639543-events'
+client = boto3.client("s3")
+events_bucket = "freedom-js-appb7dc6789c3d248c18c4e34a5eb639543-events"
+
 
 def get_photo(url, bucket=events_bucket):
     name = uuid.uuid4()
     r = requests.get(url, stream=True)
-    with open('photos/' + str(name), 'wb') as out_file:
+    with open("photos/" + str(name), "wb") as out_file:
         shutil.copyfileobj(r.raw, out_file)
     del r
-    extension = magic.from_file('photos/' + str(name), mime=True)
+    extension = magic.from_file("photos/" + str(name), mime=True)
     print(extension)
 
     filename = str(name) + name_to_extension[extension]
     response = client.upload_file(
-            'photos/'+str(name), 
-            bucket, 
-            'public/{}'.format(filename),
-            ExtraArgs={
-                'ACL': 'public-read',
-                'ContentType': extension
-            }
-        )
+        "photos/" + str(name),
+        bucket,
+        "public/{}".format(filename),
+        ExtraArgs={"ACL": "public-read", "ContentType": extension},
+    )
     time.sleep(3)
-    photo_url = 'https://' + bucket + '.s3.amazonaws.com' + '/public/' + filename
+    photo_url = "https://" + bucket + ".s3.amazonaws.com" + "/public/" + filename
     return photo_url
