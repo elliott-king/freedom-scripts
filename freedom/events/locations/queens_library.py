@@ -104,7 +104,7 @@ def parse_script(div: PageElement, event: Event):
 
     branch = event_dict.get("branch_name", None)
     if branch:
-        if branch.lower() == "Poppenhusen":
+        if branch.lower() == "poppenhusen" or "library" in branch.lower():
             event.location_description = branch
         else:
             event.location_description = branch + " Library"
