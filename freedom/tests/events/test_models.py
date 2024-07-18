@@ -77,6 +77,11 @@ class TestEvent:
             "source": "example.com",
             "host": "test library host",
             "locationDescription": "the middle of the moon",
+            "location": {
+                "lat": 0.0,
+                "lon": 0.0,
+            },
+            "description": "a test event",
             "rsvp": False,
             "photos": [],
             "name": "test event",
@@ -85,6 +90,7 @@ class TestEvent:
             "times": [d.time().isoformat() for d in e.datetimes],
             "createdAt": FAKE_TIME.isoformat().replace("+00:00", "Z"),
             "updatedAt": FAKE_TIME.isoformat().replace("+00:00", "Z"),
+            "types": ["test"],
             "id": e.id,
             "__typename": "Event",
         }

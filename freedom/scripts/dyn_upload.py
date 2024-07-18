@@ -110,7 +110,7 @@ def add_items_to_table(table_name: str, photo_table_name: str, items: list[Event
             continue
 
         print("Adding location", index, "- ", e.name)
-        response = table.put_item(Item=e.to_dict())
+        response = table.put_item(Item=e.to_dict(for_dynamodb=True))
         code = response["ResponseMetadata"]["HTTPStatusCode"]
         if code != 200:
             print("table put_item error:", code)

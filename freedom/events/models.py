@@ -163,12 +163,14 @@ class Event(BaseModel):
 
         curr_date_str = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
-        print("curr_date_str", curr_date_str)
         d = {
             "source": self.source,
             "host": self.host,
             "locationDescription": self.location_description,
+            "location": self.location.to_dict(),
+            "description": self.description,
             "rsvp": self.rsvp,
+            "types": self.types,
             "photos": self.photos,
             "name": self.name,
             "website": self.website,
@@ -180,7 +182,8 @@ class Event(BaseModel):
             "__typename": "Event",
         }
 
-        # DynamoDB does not take float values.
-        d = json.dumps(d, cls=DecimalEncoder)
-        d = json.loads(d, parse_float=decimal.Decimal)
+        if for_dynamodb:
+            # DynamoDB does not take float values.
+            d = json.dumps(d, cls=DecimalEncoder)
+            d = json.loads(d, parse_float=decimal.Decimal)
         return d
