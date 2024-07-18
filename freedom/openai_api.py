@@ -2,7 +2,7 @@ import json
 import os
 
 from openai import OpenAI
-from events.types import EVENT_TYPES
+from freedom.events.types import EVENT_TYPES
 
 API_KEY = os.environ['OPENAI_API_KEY']
 MODEL = "gpt-3.5-turbo"

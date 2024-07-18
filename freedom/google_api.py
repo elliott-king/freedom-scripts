@@ -1,7 +1,7 @@
 import os
 import requests
 
-from .utils import Location
+from freedom.utils import Location
 
 MAPS_API_KEY = os.environ['MAPS_API_KEY']
     
