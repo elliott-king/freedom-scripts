@@ -4,14 +4,13 @@ import json
 import os
 import uuid
 
-from datetime import datetime, timezone
-
 from boto3.dynamodb.conditions import Key, Attr
 from botocore.exceptions import ClientError
 from collections import defaultdict
+from datetime import datetime, timezone
 
-from events.models import Event, BaseModel
-from scripts import legacy_support
+from freedom.events.models import Event, BaseModel
+from freedom.scripts import legacy_support
 
 # Updating items after a full table scan.
 # table.update_item(Key={'id': item['id']}, UpdateExpression='set permanent = :r', ExpressionAttributeValues={':r': 'true'})

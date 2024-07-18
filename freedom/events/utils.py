@@ -1,8 +1,8 @@
 import json
 
-from events.models import Event
+from freedom.events.models import Event
 
-DEBUG_FILE = 'events/debug.json'
+DEBUG_FILE = 'freedom/events/debug.json'
 
 def in_prev_parsed_events(prev_events, event, onetime_date=None):
     name = event['name'].lower().strip()

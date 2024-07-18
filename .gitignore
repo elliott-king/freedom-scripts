@@ -120,5 +120,6 @@ dmypy.json
 .pyre/
 
 # Our images
-scripts/photos
-events/debug.json
+freedom/scripts/photos
+freedom/events/debug.json
+freedom/**/*.txt

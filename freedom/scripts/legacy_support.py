@@ -1,5 +1,7 @@
 import uuid
 
+from freedom.events.models import BaseModel
+
 def convert_old_dynamo_publicart(p):
     location = {
             'name': p['name'],
@@ -15,7 +17,7 @@ def convert_old_dynamo_publicart(p):
         location['photos'] = p['photos']
     return location
 
-def update_legacy_photo(location):
+def update_legacy_photo(location: BaseModel):
     if 'photos' in location and len(location['photos']) > 0:
         # We won't bother with more than one photo for now.
         return {
