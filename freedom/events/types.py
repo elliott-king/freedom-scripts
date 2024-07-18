@@ -34,11 +34,11 @@ EVENT_TYPES = [
     "world_events",
 ]
 
-def rsvp(description):
+def infer_rsvp(description: str):
     if 'no registr' in description.lower():
         return False
-    for s in ['rsvp', 'regist', 'sign-up', 'ticket', 'reserve', 'appointment']:
-        if s in description.lower():
+    for description in ['rsvp', 'regist', 'sign-up', 'ticket', 'reserve', 'appointment']:
+        if description in description.lower():
             return True
     return False
 

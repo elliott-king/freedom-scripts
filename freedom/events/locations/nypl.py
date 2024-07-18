@@ -59,7 +59,7 @@ def parse_single_event_json(event_json):
 
   event['rsvp'] = (
     not not event_json['attributes']['registration-type']
-    or types.rsvp(full_description)
+    or types.infer_rsvp(full_description)
   )
 
   return event

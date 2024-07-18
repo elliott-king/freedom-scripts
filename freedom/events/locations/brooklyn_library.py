@@ -51,7 +51,7 @@ def events(table=dyn_upload.DEV_EVENTS_TABLE):
         return node.text.strip()
       description_divs = eventpage.find_all('div', class_='pane-entity-field')
       long_description = ' '.join(list(map(extract_text, description_divs)))
-      event['rsvp'] = types.rsvp(long_description)
+      event['rsvp'] = types.infer_rsvp(long_description)
 
       events.append(event)
   return events
