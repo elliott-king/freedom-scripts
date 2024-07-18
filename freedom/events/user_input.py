@@ -47,14 +47,7 @@ class SkipEventError(Exception):
 def upload_multiple_with_skips(events: list[Event]):
     finalized_events = []
     for i, e in enumerate(events):
-        print("checking item", i, "of", len(events))
-
-        try:
-            e.valid()
-        except ValueError:
-            print()
-            print(f"Event {i} not filled: {e}")
-            continue
+        e.validate()
 
         if e.cancelled():
             print()
