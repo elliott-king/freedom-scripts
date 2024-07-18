@@ -118,6 +118,6 @@ def parse_eventpage(url: str, event: Event):
 
     address_div = ediv.find("div", class_="address")
     address = None
-    if address_div:
+    if address_div and not event.location_description:
         address = address_div.get_text().strip()
         event.location_description = address
