@@ -155,7 +155,20 @@ class Event(BaseModel):
 
         self.finalized = True
 
-    def to_dict(self) -> dict:
+    def photos_to_dict(self):
+        if not self.finalized:
+            raise ValueError("{self} not finalized")
+
+        return [
+            {
+                "id": str(uuid.uuid4()),
+                "eventId": self.id,
+                "url": photo,
+            }
+            for photo in self.photos
+        ]
+
+    def to_dict(self, for_dynamodb=False) -> dict:
         if not self.finalized:
             raise ValueError("{self} not finalized")
 
