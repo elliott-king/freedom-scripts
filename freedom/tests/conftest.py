@@ -4,8 +4,9 @@ import pytest
 os.environ["OPENAI_API_KEY"] = "fake-openai-api-key"
 os.environ["MAPS_API_KEY"] = "fake-maps-api-key"
 
-from freedom.events.models import Event
-from freedom.utils import Location
+# Put imports later b/c we need to set the env vars first
+from freedom.events.models import Event  # noqa: E402
+from freedom.utils import Location  # noqa: E402
 
 
 @pytest.fixture(autouse=True)

@@ -78,19 +78,19 @@ class Event(BaseModel):
         return [d.time().isoformat() for d in self.datetimes]
 
     def cancelled(self) -> bool:
-        for field in ["name", "description"]:
-            fv = getattr(self, field).lower()
+        for f in ["name", "description"]:
+            fv = getattr(self, f).lower()
             if "cancelled" in fv or "postponed" in fv or "canceled" in fv:
                 return True
         return False
 
     def valid(self):
-        for field in self.required_scalar:
-            if getattr(self, field) is None:
-                return False, field
-        for field in self.required_vector:
-            if len(getattr(self, field)) == 0:
-                return False, field
+        for f in self.required_scalar:
+            if getattr(self, f) is None:
+                return False, f
+        for f in self.required_vector:
+            if len(getattr(self, f)) == 0:
+                return False, f
         return True, None
 
     def validate(self):

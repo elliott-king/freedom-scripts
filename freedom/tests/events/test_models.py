@@ -49,7 +49,7 @@ class TestEvent:
         assert e.finalized is False
         assert e.location is None
         assert "http" not in e.website
-        assert e.id == None
+        assert e.id is None
         assert e.rsvp is None
 
         e.finalize()
@@ -59,7 +59,7 @@ class TestEvent:
         assert e.location == Location(lat=0.0, lon=0.0)
         assert "http" in e.website
         assert e.id != ""
-        assert e.rsvp == False
+        assert e.rsvp is False
 
     def test__to_dict__raises_error_if_not_finalized(self, e):
         with pytest.raises(ValueError):

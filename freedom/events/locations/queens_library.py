@@ -1,13 +1,10 @@
 import json
-import pprint
 import requests
+
 from bs4 import BeautifulSoup, ResultSet, PageElement
 from dateutil.parser import parse
-from typing import Any
 
 from freedom.events.models import Event
-
-# from scripts import dyn_upload
 
 
 URL = "https://www.queenslibrary.org"
@@ -20,7 +17,7 @@ END_RANGE = 0  # fixme: Can use up to 8
 
 def events():
 
-    events: list[Event] = []
+    ql_events: list[Event] = []
     for i in range(0, 1):
         print("Now on page:", i)
         eventdivs = get_eventdivs(i)
@@ -36,8 +33,8 @@ def events():
                 continue
 
             # print('event:') # useful for debugging
-            events.append(event)
-    return events
+            ql_events.append(event)
+    return ql_events
 
 
 def get_eventdivs(page_number) -> ResultSet[PageElement]:
@@ -87,7 +84,8 @@ def parse_script(div: PageElement, event: Event):
         date = parse(event_dict["date_event"].split(" - ")[0])
     except Exception as e:
         print(
-            f"issue parsing qpl date on {event_dict['title']}: '{event_dict['date_event']}' {URL + event_dict['callUrl']}"
+            f"issue parsing qpl date on {event_dict['title']}: "
+            f"'{event_dict['date_event']}' {URL + event_dict['callUrl']}"
         )
         raise e
 

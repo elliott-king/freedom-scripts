@@ -1,12 +1,5 @@
-import pprint
-import requests
-import json
-import os
-import traceback
-
 from dateutil.parser import parse
-from datetime import datetime, timedelta
-from titlecase import titlecase
+from datetime import timedelta
 from collections import defaultdict
 
 from freedom.scripts import dyn_upload
@@ -48,7 +41,7 @@ class SkipEventError(Exception):
 #         if 'location' not in e:
 #             e['location'] = search_one(e['location_description'])
 
-#     dyn_upload.add_items_to_table(dyn_upload.DEV_EVENTS_TABLE, dyn_upload.DEV_PHOTOS_TABLE, events)
+#     dyn_upload.add_items_to_table(dyn_upload.DEV_EVENTS_TABLE, dyn_upload.DEV_PHOTOS_TABLE, events)  # noqa: E501
 
 
 def upload_multiple_with_skips(events: list[Event]):
@@ -90,7 +83,7 @@ def upload_multiple_with_skips(events: list[Event]):
     #         e['location'] = places_api_search_one(e['location_description'])
     #     finalized_events.append(e)
     # write_to_debug_file(events)
-    # dyn_upload.add_items_to_table(dyn_upload.DEV_EVENTS_TABLE, dyn_upload.DEV_PHOTOS_TABLE, finalized_events)
+    # dyn_upload.add_items_to_table(dyn_upload.DEV_EVENTS_TABLE, dyn_upload.DEV_PHOTOS_TABLE, finalized_events)  # noqa: E501
 
 
 # def request_multiple(events):
@@ -135,7 +128,7 @@ def upload_multiple_with_skips(events: list[Event]):
 #             print('Did not upload')
 #         else:
 #             # TODO: should choose table
-#             dyn_upload.add_items_to_table(dyn_upload.DEV_EVENTS_TABLE, dyn_upload.DEV_PHOTOS_TABLE, [d])
+#             dyn_upload.add_items_to_table(dyn_upload.DEV_EVENTS_TABLE, dyn_upload.DEV_PHOTOS_TABLE, [d])  # noqa: E501
 
 #     except SkipEventError:
 #         print('Skipping this event')
@@ -173,28 +166,28 @@ def display_info(d):
         print(d["website"], "\n")
 
 
-def singleton_fields(d):
-    for f in d:
-        if f not in multi_fields:
-            print(f.upper(), ":", " " * (20 - len(f)), d[f])
-            new = get_user_input("If applicable, new value:\n")
-            if new and new != "yes" and new != "y" and new != "Y" and new != "Yes":
-                d[f] = new
-                if f.lower() == "rsvp":
-                    d[f] = d[f] == "True"
-            if f in title_fields:
-                d[f] = titlecase(d[f])
+# def singleton_fields(d):
+#     for f in d:
+#         if f not in multi_fields:
+#             print(f.upper(), ":", " " * (20 - len(f)), d[f])
+#             new = get_user_input("If applicable, new value:\n")
+#             if new and new != "yes" and new != "y" and new != "Y" and new != "Yes":
+#                 d[f] = new
+#                 if f.lower() == "rsvp":
+#                     d[f] = d[f] == "True"
+#             if f in title_fields:
+#                 d[f] = titlecase(d[f])
 
-    try:
-        j = r.json()["candidates"][0]  # first result probably correct
-    except IndexError:
-        raise TypeError("No location found: ", name)
+#     try:
+#         j = r.json()["candidates"][0]  # first result probably correct
+#     except IndexError:
+#         raise TypeError("No location found: ", name)
 
-    location = {
-        "lat": j["geometry"]["location"]["lat"],
-        "lon": j["geometry"]["location"]["lng"],
-    }
-    return location
+#     location = {
+#         "lat": j["geometry"]["location"]["lat"],
+#         "lon": j["geometry"]["location"]["lng"],
+#     }
+#     return location
 
 
 def apply_times(d):
