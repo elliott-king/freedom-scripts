@@ -28,7 +28,10 @@ def events():
                 print("IGNORING qpl event with parsing error: ", e)
                 continue
 
-            if not event.location_description:
+            if (
+                not event.location_description
+                or "virtual" in event.location_description.lower()
+            ):
                 print(f"IGNORING qpl {event.name}:{event.website}: a virtual event")
                 continue
 
