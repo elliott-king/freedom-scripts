@@ -99,7 +99,7 @@ def add_items_to_table(table_name: str, photo_table_name: str, items: list[Event
 
     for index, e in enumerate(items):
         if is_uploaded(e, table_name):
-            print('Cannot add: "' + e["name"] + '" already exists in dynamodb')
+            print('Cannot add: "' + e.name + '" already exists in dynamodb')
             continue
 
         try:
