@@ -157,7 +157,7 @@ class Event(BaseModel):
 
     def photos_to_dict(self):
         if not self.finalized:
-            raise ValueError("{self} not finalized")
+            raise ValueError(f"{self} not finalized")
 
         return [
             {

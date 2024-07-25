@@ -57,7 +57,7 @@ def upload_multiple_with_skips(events: list[Event]):
         e.finalize()
         finalized_events.append(e)
 
-    write_to_debug_file(events)
+    write_to_debug_file(finalized_events)
     dyn_upload.add_items_to_table(
         dyn_upload.DEV_EVENTS_TABLE, dyn_upload.DEV_PHOTOS_TABLE, finalized_events
     )
