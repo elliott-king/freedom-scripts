@@ -37,6 +37,7 @@ def places_api_search_one(name: str):
     try:
         j = r.json()["candidates"][0]  # first result probably correct
     except IndexError:
+        print("Response: ", r.text)
         raise TypeError("No location found: ", name)
 
     return Location(

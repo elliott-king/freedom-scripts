@@ -3,6 +3,7 @@ import requests
 
 from bs4 import BeautifulSoup, ResultSet, PageElement
 from dateutil.parser import parse
+from zoneinfo import ZoneInfo
 
 from freedom.events.models import Event
 
@@ -13,6 +14,8 @@ URL = "https://www.queenslibrary.org"
 FIRST_PAGE = "/calendar?searchField=*&category=calendar&fromlink=calendar&searchFilter="
 FUTURE_PAGES = "/search/call?searchField=*&category=calendar&searchFilter=&pageParam="
 END_RANGE = 0  # fixme: Can use up to 8
+
+TZ = ZoneInfo("America/New_York")
 
 
 def events():
@@ -85,6 +88,7 @@ def parse_script(div: PageElement, event: Event):
 
     try:
         date = parse(event_dict["date_event"].split(" - ")[0])
+        date = date.replace(tzinfo=TZ)
     except Exception as e:
         print(
             f"issue parsing qpl date on {event_dict['title']}: "

@@ -75,7 +75,10 @@ class Event(BaseModel):
     @property
     def times(self) -> list[str]:
         """Correctly-formatted times for DynamoDB & OpenSearch"""
-        return [d.time().isoformat() for d in self.datetimes]
+
+        # tzinfo is not being passed to .time() for some reason, so can't do:
+        # return [d.time().isoformat() for d in self.datetimes]
+        return [d.isoformat().split("T")[1] for d in self.datetimes]
 
     def cancelled(self) -> bool:
         for f in ["name", "description"]:
