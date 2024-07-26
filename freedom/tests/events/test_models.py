@@ -19,6 +19,7 @@ def e():
         location_description="the middle of the moon",
         description="a test event",
         datetimes=[FAKE_TIME],
+        gov=False,
     )
 
 
@@ -83,6 +84,7 @@ class TestEvent:
             },
             "description": "a test event",
             "rsvp": False,
+            "gov": False,
             "photos": [],
             "name": "test event",
             "website": "http://example.com/event",

@@ -16,6 +16,7 @@ FUTURE_PAGES = "/search/call?searchField=*&category=calendar&searchFilter=&pageP
 END_RANGE = 0  # fixme: Can use up to 8
 
 TZ = ZoneInfo("America/New_York")
+IS_GOV = True
 
 
 def events():
@@ -55,13 +56,7 @@ def get_eventdivs(page_number) -> ResultSet[PageElement]:
 
 
 def event_from_div(div: PageElement):
-    event = Event(source=URL, host="Queens Public Library")
-    # event = {
-    #     'source': URL,
-    #     'host': 'Queens Public Library', # TODO: fix when quarantine ends
-    #     'location_description': None, # TODO: same
-    #     'rsvp': False, # TODO: fix when quarantine ends
-    # }
+    event = Event(source=URL, host="Queens Public Library", gov=IS_GOV)
 
     if div.img:
         event.photos = [div.find("img")["src"]]

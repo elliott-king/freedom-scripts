@@ -45,6 +45,7 @@ class Event(BaseModel):
     location_description: str | None = None
     description: str | None = None
     datetimes: list[datetime] = field(default_factory=list[datetime])
+    gov: bool | None = None
 
     rsvp: bool | None = None
     types: list[str] = field(default_factory=list[str])
@@ -61,6 +62,7 @@ class Event(BaseModel):
         "host",
         "location_description",
         "description",
+        "gov",
     ]
     required_vector = ["datetimes"]
 
@@ -186,6 +188,7 @@ class Event(BaseModel):
             "location": self.location.to_dict(),
             "description": self.description,
             "rsvp": self.rsvp,
+            "gov": self.gov,
             "types": self.types,
             "photos": self.photos,
             "name": self.name,
